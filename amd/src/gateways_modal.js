@@ -33,7 +33,7 @@ import ModalEvents from 'core/modal_events';
  */
 const showModalWithPlaceholder = async() => {
     const modal = await ModalFactory.create({
-        body: await Templates.render('paygw_airtelafrica/airtel_placeholder', {})
+        body: await Templates.render('paygw_airtelafrica/placeholder', {})
     });
     modal.show();
     return modal;
@@ -87,7 +87,7 @@ export const process = (component, paymentArea, itemId, description) => {
         payButton.removeAttr('disabled');
         payButton.on('click', function (e) {
             e.preventDefault();
-            modal.setBody(Templates.render('paygw_airtelafrica/airtel_busy', {}));
+            modal.setBody(Templates.render('paygw_airtelafrica/busy', {}));
 
             return Promise.all([
                 Repository.transactionStart(component, paymentArea, itemId,

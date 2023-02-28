@@ -18,7 +18,7 @@
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ namespace paygw_airtelafrica;
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -18,7 +18,7 @@
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -253,7 +253,6 @@ class airtel_helper {
             $result = substr($response, strpos($response, '{'));
             $decoded = json_decode($result, true);
         } finally {
-            $this->debug_print($location, $headers, $data, $decoded);
             // Trigger an event.
             $eventargs = ['context' => \context_system::instance(),
                 'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
@@ -339,24 +338,5 @@ class airtel_helper {
             'ROUTER116' => 'The encrypted value of the pin is incorrect. Kindly re-check the encryption mechanism.',
             'ROUTER117' => 'An error occurred while generating the response'];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
-    }
-
-    /**
-     * Debug print
-     *
-     * @param string $location
-     * @param array $headers
-     * @param array $data
-     * @param string $decoded
-     */
-    private function debug_print(string $location, array $headers, array $data, $decoded) {
-        global $CFG;
-        if (debugging() && !empty($CFG->debugdisplay) && $location != 'https://openapiuat.airtel.africa/auth/oauth2/token') {
-            mtrace('');
-            mtrace('Location: ' . $location);
-            mtrace('Headers: ' . json_encode($headers));
-            mtrace('Data: ' . json_encode($data));
-            mtrace('Result: ' . json_encode($decoded));
-        }
     }
 }

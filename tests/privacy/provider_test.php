@@ -18,7 +18,7 @@
  * Privacy provider tests.
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ use core_privacy\local\request\writer;
  * Privacy provider test for enrol_paypal.
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

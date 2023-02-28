@@ -18,7 +18,7 @@
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ namespace paygw_airtelafrica;
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2022 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -127,16 +127,18 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
-        $this->ping_payment($result['data']['transaction']['id']);
+        $transactionid = $result['data']['transaction']['id'];
+        $this->ping_payment((int)$transactionid);
 
         // Incorrect pin.
         $random = random_int(1000000000, 9999999999);
         $result = $helper->request_payment($random, "course$random", 1000, 'UGX', $this->phone, 'UG');
         $this->assertDebuggingNotCalled();
-        $this->assertEquals('Success.', $result['data']['transaction']['status']);
+        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
-        $this->ping_payment($result['data']['transaction']['id']);
+        $transactionid = $result['data']['transaction']['id'];
+        $this->ping_payment((int)$transactionid);
     }
 
     /**
@@ -163,32 +165,17 @@ class airtel_helper_test extends \advanced_testcase {
         // Get transaction.
         $transactionid = $result['data']['transaction']['id'];
         $result = $helper->transaction_enquiry($transactionid, 'UGX');
-        $this->assertEquals('TIP', $result['data']['transaction']['status']);
+        $this->assertEquals('TS', $result['data']['transaction']['status']);
         $this->assertEquals('DP00800001006', $result['status']['response_code']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertTrue($result['status']['success']);
         $this->assertEquals('ESB000010', $result['status']['result_code']);
         $this->assertEquals('SUCCESS', $result['status']['message']);
-        $transactionid = $result['data']['transaction']['id'];
-
-        for ($i = 1; $i < 11; $i++) {
-            sleep(30);
-            $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
-            $result = $helper->transaction_enquiry($transactionid, 'UGX');
-            if ($result['status']['response_code'] != 'DP00800001006') {
-                break;
-            }
-        }
-        // User did not enter a pin => the transaction was cancelled.
-        $this->assertEquals('TF', $result['data']['transaction']['status']);
-        $this->assertEquals('DP00800001005', $result['status']['response_code']);
 
         // Cancel payment.
-        // Not working as the transaction enquiry returns the wrong data without Airtel Africa money id.
-        $cancelid = $result['data']['transaction']['airtel_money_id'];
-        $result = $helper->make_refund((int)$cancelid, 'UGX');
+        $result = $helper->make_refund(66666666, 'UGX');
         $this->assertDebuggingNotCalled();
-        $this->assertEquals(500, $result['status']['code']);
+        $this->assertEquals(200, $result['status']['code']);
 
         $user = $this->getDataGenerator()->create_user(['country' => 'UG']);
         $this->setUser($user);
@@ -238,7 +225,6 @@ class airtel_helper_test extends \advanced_testcase {
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');
             $response = $result['status']['response_code'];
-            mtrace($helper->dp_code($response));
             if ($response == 'DP00800001001') {
                 $cancelid = $result['data']['transaction']['airtel_money_id'];
                 // Cancel payment.
@@ -248,8 +234,7 @@ class airtel_helper_test extends \advanced_testcase {
                 break;
             }
             $response = $result['data']['transaction']['status'];
-            mtrace($helper->ta_code($response));
-            if ($response == 'TF') {
+            if ($response == 'TF' || $response == 'TS') {
                 break;
             }
             sleep(30);

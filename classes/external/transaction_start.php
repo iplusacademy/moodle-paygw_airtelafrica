@@ -92,18 +92,14 @@ class transaction_start extends external_api {
         $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
         $random = random_int(1000000000, 9999999999);
         $esb = 'ESB000001';
-        $transactionid = '0';
+        $transactionid = ($itemid == 66666666) ? $itemid : 0;
         $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country);
         $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
         if (array_key_exists('status', $result)) {
             if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
                 $transactionid = $result['data']['transaction']['id'];
             }
-            $esb = $result['status']['result_code'];
-        }
-        if ($itemid == 66666666) {
-            $esb = 'ESB000010';
-            $transactionid = '66666666';;
+            $esb = ($itemid == 66666666) ? 'ESB000010' : $result['status']['result_code'];
         }
         $message = $helper->esb_code($esb);
         return ['transactionid' => $transactionid, 'message' => $message];
@@ -116,7 +112,7 @@ class transaction_start extends external_api {
      */
     public static function execute_returns() {
         return new external_function_parameters([
-            'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or ) when not successful'),
+            'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
             'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
         ]);
     }

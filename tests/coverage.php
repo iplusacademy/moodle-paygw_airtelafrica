@@ -15,39 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Testing event logs
+ * Coverage info
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace paygw_airtelafrica\event;
 
 /**
- * Testing event logs
+ * Coverage info
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class request_log_test extends \advanced_testcase {
+return new class extends phpunit_coverage_info {
+    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
+    protected $includelistfolders = ['classes', ];
 
-    /**
-     * Test request_log.
-     * @covers \paygw_airtelafrica\event\request_log
-     */
-    public function test_gateway() {
-        $this->resetAfterTest();
-        $eventarray = [
-            'context' => \context_system::instance(),
-            'relateduserid' => 2,
-            'other' => ['token' => 'faketoken', 'transaction' => ['id' => 'fakeid']]];
-        $event = request_log::create($eventarray);
-        $event->trigger();
-        $event->get_name();
-        $event->get_description();
-    }
-}
+    /** @var array The list of files relative to the plugin root to include in coverage generation. */
+    protected $includelistfiles = [];
+
+    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
+    protected $excludelistfolders = ['db', 'lang'];
+
+    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
+    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
+};

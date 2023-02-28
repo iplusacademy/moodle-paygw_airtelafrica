@@ -98,17 +98,9 @@ class transaction_complete extends external_api {
             $result = $helper->transaction_enquiry($orderid, $currency);
             $status = self::array_helper('status', $result);
             $transaction = self::array_helper('transaction', self::array_helper('data', $result));
-            if ($status && !$status['success']) {
-                return ['success' => false, 'message' => $status['message']];
-            }
-            if ($status['code'] == 200 && $status['success']) {
+            $trans = 'TIP';
+            if ($status && $status['code'] == 200 && $status['success']) {
                 $trans = $transaction['status'];
-                if ($trans == 'TA' || $trans == 'TF') {
-                    return ['success' => false, 'message' => 'Transaction failed'];
-                }
-                if ($trans == 'TIP') {
-                    return ['success' => false, 'message' => 'Transaction in progress'];
-                }
                 if ($trans == 'TS') {
                     $paymentid = \core_payment\helper::save_payment(
                         $payable->get_account_id(), $component, $paymentarea, $itemid,
@@ -119,16 +111,9 @@ class transaction_complete extends external_api {
                     $record->pp_orderid = $transaction['airtel_money_id'];
                     $DB->insert_record('paygw_airtelafrica', $record);
                     $suc = \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
-                    return ['success' => $suc, 'message' => 'Transaction success'];
                 }
             }
-            if ($orderid == 66666666) {
-                $paymentid = \core_payment\helper::save_payment(
-                    $payable->get_account_id(), $component, $paymentarea, $itemid, $userid, $amount, $currency, $gateway);
-                $suc = \core_payment\helper::deliver_order($component, $paymentarea, $itemid, (int)$orderid, $userid);
-                return ['success' => $suc, 'message' => 'Payment succeeded'];
-            }
-            return ['success' => false, 'message' => 'Unknown'];
+            return ['success' => false, 'message' => $helper->ta_code($trans)];
         }
     }
 
@@ -152,9 +137,6 @@ class transaction_complete extends external_api {
      * @return array||bool
      */
     private static function array_helper(string $key, array $arr) {
-        if (array_key_exists($key, $arr)) {
-            return $arr[$key];
-        }
-        return false;
+        return (array_key_exists($key, $arr)) ? $arr[$key] : false;
     }
 }
