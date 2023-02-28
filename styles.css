@@ -1,0 +1,18 @@
+.core_payment_gateways_modal .airtelafrica .icon {
+    height: 40px;
+    width: auto;
+}
+
+#airtel-spinner .icon {
+    height: 25px;
+    width: 25px;
+}
+
+#airtel-progress_bar {
+    margin: auto auto;
+}
+
+#airtel-image img {
+    height: 46px;
+    width: 200px;
+}

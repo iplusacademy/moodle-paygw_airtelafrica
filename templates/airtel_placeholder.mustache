@@ -1,0 +1,49 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template paygw_airtelafrica/airtel_placeholder
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {}
+
+}}
+<div id="airtel-image" class="bg-grey mb-4 w-100 text-center">
+    <img src="/payment/gateway/airtelafrica/pix/img.png" title="{{#str}} plugin, paygw_airtelafrica {{/str}}" alt="{{#str}} plugin, paygw_airtelafrica {{/str}}">
+</div>
+<div class="bg-grey mb-2 w-100 text-center">{{#str}} phone2, moodle {{/str}}</div>
+<div id="airtel-phone" class="mb-2 w-100 text-center"></div>
+<div class="bg-grey mb-2 w-100 text-center">{{#str}} country, moodle {{/str}}</div>
+<div id="airtel-country" class="mb-2 w-100 text-center"></div>
+<div class="bg-grey mb-2 w-100 text-center">{{#str}} privacy:metadata:database:payments:amount, payment {{/str}}</div>
+<div id="airtel-extra" class="bg-grey rounded mb-2 w-100 text-center"></div>
+<div class="mb-2 w-100 text-center font-italic">{{#str}} warning_phone, paygw_airtelafrica {{/str}}</div>
+<div class="text-center">
+    <form id="airtel-form" action="/payment/gateway/airtelafrica/callback.php" method="post">
+        <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay" disabled>
+        <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="airtel-cancel" class="airtel-pay btn btn-secondary" data-for="enablepay">
+    </form>
+</div>
+<div id="airtel-out" class="bg-grey rounded mb-2 w-100 text-center"></div>
