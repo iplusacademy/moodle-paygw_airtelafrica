@@ -54,7 +54,7 @@ export const getConfigForJs = (component, paymentArea, itemId) => {
  * @param {string} ourReference The reference we use
  * @param {string} userPhone The users phone number
  * @param {string} userCountry the country of the user
- * @returns {Promise<transactionid: string, message: string}>}
+ * @returns {Promise<{transactionid: string, message: string}>}
  */
 export const transactionStart = (component, paymentArea, itemId, ourReference, userPhone, userCountry) => {
     const request = {
