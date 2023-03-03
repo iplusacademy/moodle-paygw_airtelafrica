@@ -70,7 +70,7 @@ This plugin is developed and tested on Moodle Core's Boost theme and Boost child
 
 This plugin will be published and regularly updated on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica)
 
-## Bug and problem reports / Support requests##
+## Bug and problem reports / Support requests ##
 
 This plugin is carefully developed and only thoroughly tested in Uganda, but bugs and problems can always appear.
 Please report bugs and problems on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica/issues)
