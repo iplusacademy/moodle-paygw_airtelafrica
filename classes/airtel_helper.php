@@ -46,7 +46,7 @@ class airtel_helper {
     /**
      * @var string The base API URL
      */
-    public $baseurl;
+    public $airtelurl;
 
     /**
      * @var string Client ID
@@ -79,29 +79,17 @@ class airtel_helper {
      * @param string $clientid The client id.
      * @param string $secret Airtel Africa secret.
      * @param string $country Airtel Africa location.
+     * @param string $token Airtel Africa token.
      * @param bool $sandbox Whether we are working with the sandbox environment or not.
      */
-    public function __construct(string $clientid, string $secret, string $country = 'UG', bool $sandbox = true) {
+    public function __construct(
+        string $clientid, string $secret, string $country = 'UG', string $token = '', bool $sandbox = true) {
         $this->clientid = $clientid;
         $this->secret = $secret;
-        $this->baseurl = self::get_baseurl($sandbox);
+        $this->airtelurl = self::get_baseurl($sandbox);
         $this->country = $country;
-        $this->token = $this->get_token();
+        $this->token = $token;
         $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
-    }
-
-    /**
-     * Authorization API: get token.
-     *
-     * @return string
-     */
-    public function get_token(): string {
-        $data = [
-            'client_id' => $this->clientid,
-            'client_secret' => $this->secret,
-            'grant_type' => 'client_credentials'];
-        $arr = $this->request_post('auth/oauth2/token', $data);
-        return (array_key_exists('access_token', $arr)) ? (string) $arr['access_token'] : '';
     }
 
     /**
@@ -127,12 +115,10 @@ class airtel_helper {
      */
     public function request_payment(
         int $transactionid, string $reference, float $amount, string $currency, string $userphone, string $usercountry): array {
-        $testing = $this->testing && $userphone = '66666666';
-        if ($testing) {
-            $result = ['data' => [
-                        'transaction' => [
-                               'id' => '8334msn88',
-                               'status' => 'SUCCESS']],
+        if ($userphone == '66666666') {
+            $result = [
+                'data' => [
+                    'transaction' => ['id' => '8334msn88', 'status' => 'SUCCESS']],
                     'status' => [
                         'code' => '200',
                         'message' => 'SUCCESS',
@@ -141,30 +127,20 @@ class airtel_helper {
                         'success' => true]];
         }
 
-        $usercountry = strtoupper($usercountry);
-        if (in_array($usercountry, \paygw_airtelafrica\gateway::get_countries())) {
-            $location = 'merchant/v1/payments/';
-            $headers = [
-                'Content-Type' => 'application/json',
-                'X-Country' => $this->country,
-                'X-Currency' => $currency,
-                'Authorization' => "Bearer  $this->token"];
-            $data = [
-                'reference' => $reference,
-                'subscriber' => [
-                    'country' => $usercountry,
-                    'currency' => $currency,
-                    'msisdn' => $userphone],
-                'transaction' => [
-                    'amount' => $amount,
-                    'country'  => $this->country,
-                    'currency' => $currency,
-                    'id'  => $transactionid]];
-            return $testing ? $result : $this->request_post($location, $data, true, $headers);
-        } else {
-            $message = $this->rr_code('ROUTER006');
-            throw new \moodle_exception('generalexceptionmessage', 'error', '', $message);
-        }
+        $location = 'merchant/v1/payments/';
+        $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
+        $data = [
+            'reference' => $reference,
+            'subscriber' => [
+                'country' => strtoupper($usercountry),
+                'currency' => $currency,
+                'msisdn' => $userphone],
+            'transaction' => [
+                'amount' => $amount,
+                'country'  => $this->country,
+                'currency' => $currency,
+                'id'  => $transactionid]];
+        return $userphone == '66666666' ? $result : $this->request_post($location, $data, $headers);
     }
 
     /**
@@ -175,49 +151,48 @@ class airtel_helper {
      * @return array Formatted API response.
      */
     public function make_refund(int $airtelmoneyid, string $currency): array {
-        $testing = $this->testing && $airtelmoneyid = 66666666;
-        if ($testing) {
-            $result = ['data' => [
-                        'transaction' => [
-                               'airtel_money_id' => 'CI210104.1549.C00029',
-                               'status' => 'SUCCESS']],
-                    'status' => [
-                        'code' => '200',
-                        'message' => 'SUCCESS',
-                        'result_code' => 'ESB000010',
-                        'success' => true]];
+        if ($airtelmoneyid == 66666666) {
+            $result = [
+                'data' => [
+                    'transaction' => [
+                        'airtel_money_id' => 'CI210104.1549.C00029',
+                        'status' => 'SUCCESS']],
+                'status' => [
+                    'code' => '200',
+                    'message' => 'SUCCESS',
+                    'result_code' => 'ESB000010',
+                    'success' => true]];
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
-        return $testing ? $result : $this->request_post('standard/v1/payments/refund', $data, true, $headers);
+        return $airtelmoneyid == 66666666 ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
     }
 
     /**
      * Collection API: transaction enquiry
      *
-     * @param string $transactionid
+     * @param string $transid
      * @param string $currency
      * @return array Formatted API response.
      */
-    public function transaction_enquiry(string $transactionid, string $currency): array {
-        $testing = $this->testing && $transactionid = '66666666';
-        if ($testing) {
+    public function transaction_enquiry(string $transid, string $currency): array {
+        if ($transid == '66666666') {
             $result = [
-                    'data' => [
-                        'transaction' => [
-                               'airtel_money_id' => 'C3648.00993.538XX.XX67',
-                               'id' => '8334msn88',
-                               'message' => 'success',
-                               'status' => 'TS']],
-                    'status' => [
-                        'code' => 200,
-                        'message' => 'SUCCESS',
-                        'result_code' => 'ESB000010',
-                        'response_code' => 'DP00800001006',
-                        'success' => true]];
+                'data' => [
+                    'transaction' => [
+                           'airtel_money_id' => 'C3648.00993.538XX.XX67',
+                           'id' => '8334msn88',
+                           'message' => 'success',
+                           'status' => 'TS']],
+                'status' => [
+                    'code' => 200,
+                    'message' => 'SUCCESS',
+                    'result_code' => 'ESB000010',
+                    'response_code' => 'DP00800001006',
+                    'success' => true]];
         }
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
-        return $testing ? $result : $this->request_post("standard/v1/payments/$transactionid", [], true, $headers, 'GET');
+        return $transid == '66666666' ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
     }
 
     /**
@@ -225,34 +200,37 @@ class airtel_helper {
      *
      * @param string $location
      * @param array $data
-     * @param bool $autorize
-     * @param array $additionalheaders
+     * @param array $headers
      * @param string $verb
      * @return array Decoded API response.
      */
     private function request_post(
-        string $location, array $data, bool $autorize = false, array $additionalheaders = [], string $verb = 'POST'): ?array {
-        $decoded = $result = '';
-        $response = null;
-        $location = $this->baseurl . $location;
-        $headers = array_merge(['Content-Type' => 'application/json'], $additionalheaders);
+        string $location, array $data, array $headers = [], string $verb = 'POST'): array {
+        $decoded = '';
         $client = new \GuzzleHttp\Client();
-        if ($autorize) {
-            $token = $this->get_token();
-            if ($token == '') {
+        if ($this->token == '') {
+            $authdata = ['client_id' => $this->clientid, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials'];
+            try {
+                $response = $client->request(
+                    'POST',
+                    $this->airtelurl . 'auth/oauth2/token',
+                    ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]);
+                $result = json_decode($response->getBody()->getContents(), true);
+                $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $this->token = '';
                 return [];
             }
-            $headers = array_merge($headers, ['Authorization' => 'Bearer   '. $this->get_token()]);
         }
+        $headers = array_merge($headers, ['Content-Type' => 'application/json', 'Authorization' => 'Bearer   ' . $this->token]);
         try {
-            $response = $client->request($verb, $location, ['headers' => $headers, 'json' => $data]);
+            $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-            $decoded = json_decode($result, true);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = $e->getMessage();
             $result = substr($response, strpos($response, '{'));
-            $decoded = json_decode($result, true);
         } finally {
+            $decoded = json_decode($result, true);
             // Trigger an event.
             $eventargs = ['context' => \context_system::instance(),
                 'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
@@ -267,7 +245,7 @@ class airtel_helper {
      * @param string $code
      * @return string
      */
-    public function ta_code(string $code) {
+    public static function ta_code(string $code): string {
         $returns = [
             'TF' => 'Transaction Failed',
             'TS' => 'Transaction Success',
@@ -281,7 +259,7 @@ class airtel_helper {
      * @param string $code
      * @return string
      */
-    public function esb_code(string $code) {
+    public static function esb_code(string $code): string {
         $returns = [
             'ESB000001' => 'Something went wrong',
             'ESB000004' => 'An error occurred while initiating the payment',
@@ -304,7 +282,7 @@ class airtel_helper {
      * @param string $code
      * @return string
      */
-    public function dp_code(string $code) {
+    public static function dp_code(string $code): string {
         $returns = [
             'DP00800001001' => 'Valid pin',
             'DP00800001002' => 'Invalid pin',
@@ -325,7 +303,7 @@ class airtel_helper {
      * @param string $code
      * @return string
      */
-    public function rr_code(string $code) {
+    public static function rr_code(string $code): string {
         $returns = [
             'ROUTER001' => 'The wallet is not configured.',
             'ROUTER003' => 'Mandatory parameters are missing either in the header or body.',

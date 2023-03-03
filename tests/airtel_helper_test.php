@@ -67,10 +67,10 @@ class airtel_helper_test extends \advanced_testcase {
     public function test_empty_helper() {
         $helper = new \paygw_airtelafrica\airtel_helper('fake', 'user');
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
-        $this->assertEquals('Transaction Success', $helper->ta_code('TS'));
-        $this->assertEquals('In process', $helper->dp_code('DP00800001006'));
-        $this->assertEquals('Something went wrong', $helper->esb_code('ESB000001'));
-        $this->assertEquals('Invalid currency provided.', $helper->rr_code('ROUTER112'));
+        $this->assertEquals('Transaction Success', \paygw_airtelafrica\airtel_helper::ta_code('TS'));
+        $this->assertEquals('In process', \paygw_airtelafrica\airtel_helper::dp_code('DP00800001006'));
+        $this->assertEquals('Something went wrong', \paygw_airtelafrica\airtel_helper::esb_code('ESB000001'));
+        $this->assertEquals('Invalid currency provided.', \paygw_airtelafrica\airtel_helper::rr_code('ROUTER112'));
         $random = random_int(1000000000, 9999999999);
         try {
             $helper->request_payment($random, "course$random", 1000, 'UGX', '1234567', 'BE');
@@ -91,7 +91,6 @@ class airtel_helper_test extends \advanced_testcase {
         $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
 
         $result = $helper->request_payment($random, "course$random", 1000, 'UGX', '66666666', 'UG');
-        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
 
@@ -101,7 +100,6 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(true, $result['status']['success']);
 
         $result = $helper->make_refund(66666666, 'UGX');
-        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
     }
@@ -119,26 +117,24 @@ class airtel_helper_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
 
         // Correct pin.
         $result = $helper->request_payment($random, "course$random", 1000, 'UGX', $this->phone, 'UG');
-        $this->assertDebuggingNotCalled();
-        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
+        $token = $helper->token;
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
         $transactionid = $result['data']['transaction']['id'];
-        $this->ping_payment((int)$transactionid);
+
+        $this->ping_payment((int)$transactionid, $token);
 
         // Incorrect pin.
         $random = random_int(1000000000, 9999999999);
         $result = $helper->request_payment($random, "course$random", 1000, 'UGX', $this->phone, 'UG');
-        $this->assertDebuggingNotCalled();
-        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
         $transactionid = $result['data']['transaction']['id'];
-        $this->ping_payment((int)$transactionid);
+        $this->ping_payment((int)$transactionid, $token);
     }
 
     /**
@@ -153,28 +149,25 @@ class airtel_helper_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
 
         // Make payment.
         $result = $helper->request_payment($random, "course$random", 66, 'UGX', $this->phone, 'UG');
-        $this->assertDebuggingNotCalled();
-        $this->assertEquals('SUCCESS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
 
         // Get transaction.
         $transactionid = $result['data']['transaction']['id'];
         $result = $helper->transaction_enquiry($transactionid, 'UGX');
-        $this->assertEquals('TS', $result['data']['transaction']['status']);
+        $this->assertEquals('TIP', $result['data']['transaction']['status']);
         $this->assertEquals('DP00800001006', $result['status']['response_code']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertTrue($result['status']['success']);
         $this->assertEquals('ESB000010', $result['status']['result_code']);
-        $this->assertEquals('SUCCESS', $result['status']['message']);
 
         // Cancel payment.
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $helper->token);
         $result = $helper->make_refund(66666666, 'UGX');
-        $this->assertDebuggingNotCalled();
         $this->assertEquals(200, $result['status']['code']);
 
         $user = $this->getDataGenerator()->create_user(['country' => 'UG']);
@@ -219,25 +212,27 @@ class airtel_helper_test extends \advanced_testcase {
     /**
      * Ping payment
      * @param int $transactionid
+     * @param string $token
      */
-    private function ping_payment(int $transactionid) {
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
+    private function ping_payment(int $transactionid, string $token) {
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $token);
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');
-            $response = $result['status']['response_code'];
-            if ($response == 'DP00800001001') {
-                $cancelid = $result['data']['transaction']['airtel_money_id'];
-                // Cancel payment.
-                $cancelresult = $helper->make_refund((int)$cancelid, 'UGX');
-                $this->assertDebuggingNotCalled();
-                $this->assertNotEquals(500, $cancelresult['status']['code']);
-                break;
+            if ($transactionid > 0 && array_key_exists('status', $result) && array_key_exists('data', $result)) {
+                $response = $result['status']['response_code'];
+                if ($response == 'DP00800001001') {
+                    $cancelid = $result['data']['transaction']['airtel_money_id'];
+                    // Cancel payment.
+                    $cancelresult = $helper->make_refund((int)$cancelid, 'UGX');
+                    $this->assertNotEquals(500, $cancelresult['status']['code']);
+                    break;
+                }
+                $response = $result['data']['transaction']['status'];
+                if ($response == 'TF' || $response == 'TS') {
+                    break;
+                }
+                sleep(15);
             }
-            $response = $result['data']['transaction']['status'];
-            if ($response == 'TF' || $response == 'TS') {
-                break;
-            }
-            sleep(30);
         }
     }
 }

@@ -102,7 +102,7 @@ class transaction_start extends external_api {
             $esb = ($itemid == 66666666) ? 'ESB000010' : $result['status']['result_code'];
         }
         $message = $helper->esb_code($esb);
-        return ['transactionid' => $transactionid, 'message' => $message];
+        return ['transactionid' => $transactionid, 'message' => $message, 'token' => $helper->token];
     }
 
     /**
@@ -114,6 +114,7 @@ class transaction_start extends external_api {
         return new external_function_parameters([
             'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
             'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
+            'token' => new external_value(PARAM_RAW, 'The Airtel token used'),
         ]);
     }
 }

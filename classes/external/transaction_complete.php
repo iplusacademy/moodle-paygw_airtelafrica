@@ -55,7 +55,7 @@ class transaction_complete extends external_api {
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
             'orderid' => new external_value(PARAM_TEXT, 'The order id coming back from Airtel Africa'),
             'userid' => new external_value(PARAM_INT, 'The user who paid'),
-            'sleep' => new external_value(PARAM_INT, 'How long do we sleep'),
+            'token' => new external_value(PARAM_TEXT, 'The airtel token we received'),
         ]);
     }
 
@@ -64,15 +64,15 @@ class transaction_complete extends external_api {
      * This function does not take cost as a parameter as we cannot rely on any provided value.
      *
      * @param string $component Name of the component that the itemid belongs to
-     * @param string $paymentarea
+     * @param string $paymentarea The payment area
      * @param int $itemid An internal identifier that is used by the component
      * @param string $orderid Airtel Africa order ID
      * @param int $userid The user who paid
-     * @param int $sleep How long do we sleep before going to work
+     * @param string $token The Airtel token
      * @return array
      */
     public static function execute(
-        string $component, string $paymentarea, int $itemid, string $orderid, int $userid, int $sleep): array {
+        string $component, string $paymentarea, int $itemid, string $orderid, int $userid, string $token): array {
         global $DB;
         $gateway = 'airtelafrica';
 
@@ -82,38 +82,38 @@ class transaction_complete extends external_api {
             'itemid' => $itemid,
             'orderid' => $orderid,
             'userid' => $userid,
-            'sleep' => $sleep,
+            'token' => $token,
         ]);
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING')) {
-            $sleep = 0;
-        }
-        sleep($sleep);
         $config = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
         $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
         $currency = $payable->get_currency();
         $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
         $amount = \core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+        $suc = false;
         if ($config->clientid != '' && $config->secret != '') {
-            $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country);
+            $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country, $token);
             $result = $helper->transaction_enquiry($orderid, $currency);
             $status = self::array_helper('status', $result);
-            $transaction = self::array_helper('transaction', self::array_helper('data', $result));
+            $data = self::array_helper('data', $result);
             $trans = 'TIP';
-            if ($status && $status['code'] == 200 && $status['success']) {
-                $trans = $transaction['status'];
-                if ($trans == 'TS') {
-                    $paymentid = \core_payment\helper::save_payment(
-                        $payable->get_account_id(), $component, $paymentarea, $itemid,
-                        $userid, $amount, $currency, $gateway);
+            if ($status && $data && $status['code'] == 200 && $status['success']) {
+                $transaction = self::array_helper('transaction', $data);
+                if ($transaction) {
+                    if ($transaction['status'] == 'TS') {
+                        $paymentid = \core_payment\helper::save_payment(
+                            $payable->get_account_id(), $component, $paymentarea, $itemid, $userid, $amount, $currency, $gateway);
 
-                    $record = new \stdClass();
-                    $record->paymentid = $paymentid;
-                    $record->pp_orderid = $transaction['airtel_money_id'];
-                    $DB->insert_record('paygw_airtelafrica', $record);
-                    $suc = \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
+                        $record = new \stdClass();
+                        $record->paymentid = $paymentid;
+                        $record->pp_orderid = $transaction['airtel_money_id'];
+                        $DB->insert_record('paygw_airtelafrica', $record);
+                        $suc = \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
+                    } else if ($transaction['status'] == 'TIP') {
+                        $suc = true;
+                    }
                 }
             }
-            return ['success' => false, 'message' => $helper->ta_code($trans)];
+            return ['success' => $suc, 'message' => \paygw_airtelafrica\airtel_helper::ta_code($trans)];
         }
     }
 
