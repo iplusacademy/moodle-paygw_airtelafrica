@@ -137,9 +137,9 @@ class airtel_helper {
                 'msisdn' => $userphone],
             'transaction' => [
                 'amount' => $amount,
-                'country'  => $this->country,
+                'country' => $this->country,
                 'currency' => $currency,
-                'id'  => $transactionid]];
+                'id' => $transactionid]];
         return $userphone == '66666666' ? $result : $this->request_post($location, $data, $headers);
     }
 

@@ -46,7 +46,7 @@ export const getConfigForJs = (component, paymentArea, itemId) => {
 };
 
 /**
- * Starts an Airtel Africa payment
+ * Starts an Airtel Africa payment.
  *
  * @param {string} component Name of the component that the itemId belongs to
  * @param {string} paymentArea The area of the component that the itemId belongs to
@@ -73,7 +73,7 @@ export const transactionStart = (component, paymentArea, itemId, ourReference, u
 };
 
 /**
- * Completes an Airtel Africa payment
+ * Completes an Airtel Africa payment.
  *
  * @param {string} component Name of the component that the itemId belongs to
  * @param {string} paymentArea The area of the component that the itemId belongs to

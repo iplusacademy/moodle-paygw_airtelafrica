@@ -80,12 +80,12 @@ export const process = (component, paymentArea, itemId, description) => {
     })
     .then(([modal, airtelConfig]) => {
         const cancelButton = modal.getRoot().find('#airtel-cancel');
-        cancelButton.on('click', function () {
+        cancelButton.on('click', function() {
             modal.destroy();
         });
         const payButton = modal.getRoot().find('#airtel-pay');
         payButton.removeAttr('disabled');
-        payButton.on('click', function (e) {
+        payButton.on('click', function(e) {
             e.preventDefault();
             modal.setBody(Templates.render('paygw_airtelafrica/busy', {}));
 
@@ -95,7 +95,7 @@ export const process = (component, paymentArea, itemId, description) => {
             ])
             .then(([airtelPay]) => {
                 const cancelButton1 = modal.getRoot().find('#airtel-cancel');
-                cancelButton1.on('click', function () {
+                cancelButton1.on('click', function() {
                     modal.destroy();
                 });
                 console.log('Airtel Africa payment process started');  // eslint-disable-line
@@ -109,8 +109,8 @@ export const process = (component, paymentArea, itemId, description) => {
                 var tip = 'TIP';
                 const b = '</div>';
                 const progressDiv = modal.getRoot().find('#airtel-progress_bar');
-                arrayints.forEach(function (el, index) {
-                    setTimeout(function () {
+                arrayints.forEach(function(el, index) {
+                    setTimeout(function() {
                         progressDiv.attr('value', el * 10);
                         if (airtelPay.transactionid > 0) {
                             if (tip == 'TIP') {
@@ -136,7 +136,7 @@ export const process = (component, paymentArea, itemId, description) => {
                                         spinnerDiv.attr('display', 'hidden');
                                         const payButton1 = modal.getRoot().find('#airtel-pay');
                                         payButton1.removeAttr('disabled');
-                                        payButton1.on('click', function () {
+                                        payButton1.on('click', function() {
                                             modal.destroy();
                                         });
                                         spinnerDiv.attr('style', 'display: none;');
