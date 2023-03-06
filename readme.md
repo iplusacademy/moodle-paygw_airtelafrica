@@ -78,6 +78,15 @@ This plugin is developed and tested using
 
 This plugin will be published and regularly updated on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica)
 
+## Challenges ##
+
+The main problem is that we can't use a reliable callback. The transition from sandbox to production environment in Moodle is immediate,
+the transition from sandbox to production environment in Airtel Africa can take days. So a sandbox callback can end up in a production
+environment and vice versa. We addressed this issue by:
+
+- using the callback only as a backup tool, in case a successful payment was missed.
+- pinging the server for three minutes to see if the payment was successful.
+
 ## Bug and problem reports / Support requests ##
 
 This plugin is carefully developed and only thoroughly tested in Uganda, but bugs and problems can always appear.

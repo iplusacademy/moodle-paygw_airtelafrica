@@ -32,7 +32,6 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-use paygw_airtelafrica\airtel_helper;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');

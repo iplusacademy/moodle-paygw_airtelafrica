@@ -93,7 +93,8 @@ class transaction_start extends external_api {
         $random = random_int(1000000000, 9999999999);
         $esb = 'ESB000001';
         $transactionid = ($itemid == 66666666) ? $itemid : 0;
-        $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country);
+        $helper = new \paygw_airtelafrica\airtel_helper(
+            $config->clientid, $config->secret, $config->country, '', $config->environment);
         $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
         if (array_key_exists('status', $result)) {
             if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {

@@ -25,6 +25,7 @@ import * as Repository from './repository';
 import Templates from 'core/templates';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
+import {get_string as getString} from 'core/str';
 
 /**
  * Creates and shows a modal that contains a placeholder.
@@ -54,7 +55,7 @@ export const process = (component, paymentArea, itemId, description) => {
         Repository.getConfigForJs(component, paymentArea, itemId),
     ])
     .then(([modal, airtelConfig]) => {
-        modal.setTitle('Airtel Africa');
+        modal.setTitle(getString('pluginname', 'paygw_airtelafrica'));
         const phoneNumber = modal.getRoot().find('#airtel-phone');
         phoneNumber.append('<h4>' + airtelConfig.phone + '</h4>');
         const userCountry = modal.getRoot().find('#airtel-country');

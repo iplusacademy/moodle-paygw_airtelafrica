@@ -92,7 +92,8 @@ class transaction_complete extends external_api {
         $suc = false;
         $trans = 'TIP';
         if ($config->clientid != '' && $config->secret != '') {
-            $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country, $token);
+            $helper = new \paygw_airtelafrica\airtel_helper(
+                $config->clientid, $config->secret, $config->country, $token, $config->environment);
             $result = $helper->transaction_enquiry($orderid, $currency);
             $status = self::array_helper('status', $result);
             $data = self::array_helper('data', $result);

@@ -79,10 +79,10 @@ class airtel_helper {
      * @param string $secret Airtel Africa secret.
      * @param string $country Airtel Africa location.
      * @param string $token Airtel Africa token.
-     * @param bool $sandbox Whether we are working with the sandbox environment or not.
+     * @param string $sandbox Whether we are working with the sandbox environment or not.
      */
     public function __construct(
-        string $clientid, string $secret, string $country = 'UG', string $token = '', bool $sandbox = true) {
+        string $clientid, string $secret, string $country = 'UG', string $token = '', string $sandbox = 'sandbox') {
         $this->clientid = $clientid;
         $this->secret = $secret;
         $this->airtelurl = self::get_baseurl($sandbox);
@@ -94,11 +94,11 @@ class airtel_helper {
     /**
      * Which url should be used.
      *
-     * @param bool $sandbox
+     * @param string $sandbox
      * @return string
      */
-    public static function get_baseurl(bool $sandbox = true): string {
-        return $sandbox ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
+    private static function get_baseurl(string $sandbox): string {
+        return $sandbox == 'sandbox' ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
     }
 
     /**
