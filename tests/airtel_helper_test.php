@@ -215,6 +215,9 @@ class airtel_helper_test extends \advanced_testcase {
      * @param string $token
      */
     private function ping_payment(int $transactionid, string $token) {
+        if ($transactionid == 0) {
+            throw new \moodle_exception('Invalid transaction id.');
+        }
         $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $token);
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');

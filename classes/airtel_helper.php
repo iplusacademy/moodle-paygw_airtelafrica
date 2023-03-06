@@ -29,7 +29,6 @@ use curl;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
 
 
@@ -227,8 +226,7 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getMessage();
-            $result = substr($response, strpos($response, '{'));
+            $result = substr($e->getMessage(), strpos($e->getMessage(), '{'));
         } finally {
             $decoded = json_decode($result, true);
             // Trigger an event.

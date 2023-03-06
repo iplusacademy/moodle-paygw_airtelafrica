@@ -1,4 +1,4 @@
-# Airtel Africa #
+# Payment gateway Airtel Africa #
 
 This plugin was developed thanks to funding from [Medical Access Uganda](https://e-learning.medical-access.org) and [i+academy](https://iplusacademy.org)
 
@@ -65,6 +65,14 @@ see also:
 ## Theme support ##
 
 This plugin is developed and tested on Moodle Core's Boost theme and Boost child themes, including Moodle Core's Classic theme.
+
+## Database support ##
+
+This plugin is developed and tested using
+
+* MYSQL
+* MariaDB
+* PostgreSQL
 
 ## Plugin repositories ##
 

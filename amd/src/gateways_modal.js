@@ -98,59 +98,64 @@ export const process = (component, paymentArea, itemId, description) => {
                 cancelButton1.on('click', function() {
                     modal.destroy();
                 });
-                console.log('Airtel Africa payment process started');  // eslint-disable-line
-                console.log('TransactionId: ' + airtelPay.transactionid);  // eslint-disable-line
-                console.log('Token: ' + airtelPay.token);  // eslint-disable-line
-                const outDiv = modal.getRoot().find('#airtel-out');
-                const spinnerDiv = modal.getRoot().find('#airtel-spinner');
-                outDiv.append('<h4>TransactionId: ' + airtelPay.transactionid + '</h4>');
-                var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                var interval = 20000;
-                var tip = 'TIP';
-                const b = '</div>';
-                const progressDiv = modal.getRoot().find('#airtel-progress_bar');
-                arrayints.forEach(function(el, index) {
-                    setTimeout(function() {
-                        progressDiv.attr('value', el * 10);
-                        if (airtelPay.transactionid > 0) {
-                            if (tip == 'TIP') {
-                                modal.setFooter('Step ' + el + '/10');
-                                Promise.all([
-                                    Repository.transactionComplete(
-                                        component, paymentArea, itemId, airtelPay.transactionid, airtelConfig.userid, el),
-                                ])
-                                .then(([airtelPing]) => {
-                                    modal.setFooter(airtelPing.message);
-                                    console.log(airtelPing.message);  // eslint-disable-line
-                                    if (airtelPing.message == 'Transaction failed') {
-                                        tip = 'TF';
-                                        const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
-                                        outDiv.append(a + airtelPing.message + b);
-                                        spinnerDiv.attr('style', 'display: none;');
-                                        return;
-                                    }
-                                    if (airtelPing.success == true) {
-                                        tip = 'TS';
-                                        const a = '<br/><div class="p-3 mb-2 text-success font-weight-bold">';
-                                        outDiv.append(a + airtelPing.message + b);
-                                        spinnerDiv.attr('display', 'hidden');
-                                        const payButton1 = modal.getRoot().find('#airtel-pay');
-                                        payButton1.removeAttr('disabled');
-                                        payButton1.on('click', function() {
-                                            modal.destroy();
-                                        });
-                                        spinnerDiv.attr('style', 'display: none;');
-                                        cancelButton1.attr('style', 'display: none;');
-                                        return;
-                                    }
-                                });
+                if (airtelPay.transactionid > 0) {
+                    console.log('Airtel Africa payment process started');  // eslint-disable-line
+                    console.log('TransactionId: ' + airtelPay.transactionid);  // eslint-disable-line
+                    console.log('Token: ' + airtelPay.token);  // eslint-disable-line
+                    const outDiv = modal.getRoot().find('#airtel-out');
+                    const spinnerDiv = modal.getRoot().find('#airtel-spinner');
+                    outDiv.append('<h4>TransactionId: ' + airtelPay.transactionid + '</h4>');
+                    var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                    var interval = 20000;
+                    var tip = 'TIP';
+                    const b = '</div>';
+                    const progressDiv = modal.getRoot().find('#airtel-progress_bar');
+                    arrayints.forEach(function(el, index) {
+                        setTimeout(function() {
+                            progressDiv.attr('value', el * 10);
+                            if (airtelPay.transactionid > 0) {
+                                if (tip == 'TIP') {
+                                    modal.setFooter('Step ' + el + '/10');
+                                    Promise.all([
+                                        Repository.transactionComplete(
+                                            component, paymentArea, itemId, airtelPay.transactionid, airtelConfig.userid, el),
+                                    ])
+                                    .then(([airtelPing]) => {
+                                        modal.setFooter(airtelPing.message);
+                                        console.log(airtelPing.message);  // eslint-disable-line
+                                        if (airtelPing.message == 'Transaction failed') {
+                                            tip = 'TF';
+                                            const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
+                                            outDiv.append(a + airtelPing.message + b);
+                                            spinnerDiv.attr('style', 'display: none;');
+                                            return;
+                                        }
+                                        if (airtelPing.success == true) {
+                                            tip = 'TS';
+                                            const a = '<br/><div class="p-3 mb-2 text-success font-weight-bold">';
+                                            outDiv.append(a + airtelPing.message + b);
+                                            spinnerDiv.attr('display', 'hidden');
+                                            const payButton1 = modal.getRoot().find('#airtel-pay');
+                                            payButton1.removeAttr('disabled');
+                                            payButton1.on('click', function() {
+                                                modal.destroy();
+                                            });
+                                            spinnerDiv.attr('style', 'display: none;');
+                                            cancelButton1.attr('style', 'display: none;');
+                                            return;
+                                        }
+                                    });
+                                }
+                                if (el == 10) {
+                                    modal.destroy();
+                                }
                             }
-                            if (el == 10) {
-                                modal.destroy();
-                            }
-                        }
-                    }, index * interval);
-                });
+                        }, index * interval);
+                    });
+                } else {
+                    console.log('Airtel Africa transaction FAILED');  // eslint-disable-line
+                    modal.setFooter('FAILED');
+                }
             }).catch(e => {
                 // We want to use promise reject here - as that's what core payment stuff expects.
                 console.log('Airtel Africa payment rejected');  // eslint-disable-line

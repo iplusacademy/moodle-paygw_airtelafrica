@@ -90,6 +90,7 @@ class transaction_complete extends external_api {
         $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
         $amount = \core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
         $suc = false;
+        $trans = 'TIP';
         if ($config->clientid != '' && $config->secret != '') {
             $helper = new \paygw_airtelafrica\airtel_helper($config->clientid, $config->secret, $config->country, $token);
             $result = $helper->transaction_enquiry($orderid, $currency);
@@ -99,6 +100,8 @@ class transaction_complete extends external_api {
             if ($status && $data && $status['code'] == 200 && $status['success']) {
                 $transaction = self::array_helper('transaction', $data);
                 if ($transaction) {
+                    $suc = true;
+                    $trans = $transaction['status'];
                     if ($transaction['status'] == 'TS') {
                         $paymentid = \core_payment\helper::save_payment(
                             $payable->get_account_id(), $component, $paymentarea, $itemid, $userid, $amount, $currency, $gateway);
@@ -106,15 +109,13 @@ class transaction_complete extends external_api {
                         $record = new \stdClass();
                         $record->paymentid = $paymentid;
                         $record->pp_orderid = $transaction['airtel_money_id'];
-                        $DB->insert_record('paygw_airtelafrica', $record);
-                        $suc = \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
-                    } else if ($transaction['status'] == 'TIP') {
-                        $suc = true;
+                        $suc = $DB->insert_record('paygw_airtelafrica', $record);
+                        $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
                     }
                 }
             }
-            return ['success' => $suc, 'message' => \paygw_airtelafrica\airtel_helper::ta_code($trans)];
         }
+        return ['success' => $suc, 'message' => \paygw_airtelafrica\airtel_helper::ta_code($trans)];
     }
 
     /**
