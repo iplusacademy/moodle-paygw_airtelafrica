@@ -105,6 +105,38 @@ class external_test extends \advanced_testcase {
     }
 
     /**
+     * Test complete cycle.
+     * @covers \paygw_airtelafrica\external\get_config_for_js
+     * @covers \paygw_airtelafrica\external\transaction_start
+     * @covers \paygw_airtelafrica\external\transaction_complete
+     */
+    public function test_complete_cycle() {
+        global $USER;
+        $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
+        $clientid = getenv('login') ? getenv('login') : 'fakelogin';
+        $this->assertEquals($clientid, $result['clientid']);
+        $this->assertEquals('maul', $result['brandname']);
+        $this->assertEquals('UG', $result['country']);
+        $this->assertEquals(66, $result['cost']);
+        $this->assertEquals('UGX', $result['currency']);
+        $this->assertEquals($this->phone, $result['phone']);
+        $this->assertEquals('UG', $result['usercountry']);
+        $this->assertEquals($USER->id, $result['userid']);
+        $this->assertNotEmpty($result['reference']);
+        $userid = $result['userid'];
+
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $result['phone'], $result['country']);
+        $this->assertNotEmpty($result['transactionid']);
+        $this->assertEquals('OK', $result['message']);
+        $this->assertEquals('', $result['token']);
+
+        $result = transaction_complete::execute(
+            'enrol_fee', 'fee', $this->feeid, $result['transactionid'], $userid, $result['token']);
+        $this->assertFalse($result['success']);
+        $this->assertEquals('Transaction in Progress', $result['message']);
+    }
+
+    /**
      * Test request log.
      * @covers \paygw_airtelafrica\event\request_log
      * @covers \paygw_airtelafrica\airtel_helper

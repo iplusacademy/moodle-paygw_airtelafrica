@@ -35,18 +35,27 @@ namespace paygw_airtelafrica;
  */
 class gateway_test extends \advanced_testcase {
 
+    /** @var \core_payment\account account */
+    private $account;
+
+    /**
+     * Setup function.
+     */
+    protected function setUp(): void {
+        $this->resetAfterTest(true);
+        set_config('country', 'UG');
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
+        $this->account = $generator->create_payment_account(['gateways' => 'airtelafrica']);
+    }
+
     /**
      * Test gateway.
      * @covers \paygw_airtelafrica\gateway
      */
     public function test_gateway() {
-        $this->resetAfterTest();
         $this->assertCount(13, gateway::get_supported_currencies());
         $errors = [];
-        $generator = $this->getDataGenerator();
-        $paygen = $generator->get_plugin_generator('core_payment');
-        $account = $paygen->create_payment_account(['gateways' => 'airtelafrica']);
-        $gateway = $account->get_gateways()['airtelafrica'];
+        $gateway = $this->account->get_gateways()['airtelafrica'];
         $form = new \core_payment\form\account_gateway('', ['persistent' => $gateway]);
         $data = new \stdClass();
         $data->enabled = true;
@@ -60,7 +69,6 @@ class gateway_test extends \advanced_testcase {
      */
     public function test_create_account() {
         global $DB;
-        $this->resetAfterTest();
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
         $this->assertTrue($generator instanceof \core_payment_generator);
         $account1 = $generator->create_payment_account();
@@ -82,11 +90,9 @@ class gateway_test extends \advanced_testcase {
      */
     public function test_create_payment() {
         global $DB;
-        $this->resetAfterTest();
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
-        $account = $generator->create_payment_account(['gateways' => 'airtelafrica']);
         $user = $this->getDataGenerator()->create_user(['phone1' => '888888888']);
-        $paymentid = $generator->create_payment(['accountid' => $account->get('id'), 'amount' => 10, 'userid' => $user->id]);
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
+        $paymentid = $generator->create_payment(['accountid' => $this->account->get('id'), 'amount' => 10, 'userid' => $user->id]);
         $this->assertEquals('testcomponent', $DB->get_field('payments', 'component', ['id' => $paymentid]));
     }
 
@@ -97,25 +103,21 @@ class gateway_test extends \advanced_testcase {
      */
     public function test_get_payable() {
         global $DB;
-        $this->resetAfterTest();
-
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         $feeplugin = enrol_get_plugin('fee');
         $generator = $this->getDataGenerator();
-        $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
         $course = $generator->create_course();
         $data = [
             'courseid' => $course->id,
-            'customint1' => $account->get('id'),
+            'customint1' => $this->account->get('id'),
             'cost' => 250,
             'currency' => 'USD',
             'roleid' => $studentrole->id,
         ];
         $id = $feeplugin->add_instance($course, $data);
         $payable = \enrol_fee\payment\service_provider::get_payable('fee', $id);
-        $this->assertEquals($account->get('id'), $payable->get_account_id());
+        $this->assertEquals($this->account->get('id'), $payable->get_account_id());
         $this->assertEquals(250, $payable->get_amount());
         $this->assertEquals('USD', $payable->get_currency());
     }
-
 }

@@ -24,7 +24,8 @@ Currently this plugin supports payment on following currencies:
 | Madagascar | MG | Malagasy ariary | MGA | 
 | Malawi | MW | Malawian kwacha | MWK | 
 
-## Setup Airtel Africa account ##
+
+## Setup Airtel Africa account
 
 To set up access within Moodle you will need to:
 
@@ -35,13 +36,13 @@ To set up access within Moodle you will need to:
 - If you want to test this plugin in the sandbox environment, contact your local Airtel representative. He/she will *manually* confirm your test payment.
 - Do __NOT__ rely on the sandbox environment, sometimes this service just stops working. If you are lucky, everything returns to normal after a week
 
-## Requirements ##
+## Requirements
 
 - This plugin requires Moodle 4.1.0+
 - Currently this plugin is using the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
 - From Moodle_402_STABLE on this dependency will not be necessary any more as Guzzle will be part of Moodle.
 
-## Configure Moodle ##
+## Configure Moodle
 
 - Go to site administration / Plugins / Manage payment gateways and enable the Airtel Africa payment gateway.
 - Go to site administration / Payments / Payment accounts
@@ -51,7 +52,7 @@ To set up access within Moodle you will need to:
     - Enter your clientid from the application you have created in the Airtel developer centre
     - Paste your own private key value.
 
-## Add Enrolment on payment. ##
+## Add Enrolment on payment
 
 - Go to Go to Site administration > Plugins > Enrolments > Manage enrol plugins and click the eye icon opposite Enrolment on payment.
 - Click the settings link, configure as required then click the 'Save changes' button.
@@ -62,11 +63,11 @@ see also:
 [moodledocs: Payment Gateways](https://docs.moodle.org/en/Payment_gateways)  
 [moodledocs: Enrolment on Payment](https://docs.moodle.org/en/Enrolment_on_payment)
 
-## Theme support ##
+## Theme support
 
 This plugin is developed and tested on Moodle Core's Boost theme and Boost child themes, including Moodle Core's Classic theme.
 
-## Database support ##
+## Database support
 
 This plugin is developed and tested using
 
@@ -74,11 +75,11 @@ This plugin is developed and tested using
 * MariaDB
 * PostgreSQL
 
-## Plugin repositories ##
+## Plugin repositories
 
 This plugin will be published and regularly updated on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica)
 
-## Challenges ##
+## Challenges
 
 The main problem is that we can't use a reliable callback. The transition from sandbox to production environment in Moodle is immediate,
 the transition from sandbox to production environment in Airtel Africa can take days. So a sandbox callback can end up in a production
@@ -87,20 +88,24 @@ environment and vice versa. We addressed this issue by:
 - using the callback only as a backup tool, in case a successful payment was missed.
 - pinging the server for three minutes to see if the payment was successful.
 
-## Bug and problem reports / Support requests ##
+## Bug and problem reports / Support requests
 
 This plugin is carefully developed and only thoroughly tested in Uganda, but bugs and problems can always appear.
 Please report bugs and problems on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica/issues)
 We will do our best to solve your problems, but please note that we can't provide per-case support.
 Please contact you Airtel Africa representative in case you get invalid transactionids or timeouts.
 
-## Feature proposals ##
+## Feature proposals
 
 - Please issue feature proposals on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica/issues)
 - Please create pull requests on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica/pulls)
 - We are always interested to read about your feature proposals or even get a pull request from you, but please accept that we can handle your issues only as feature proposals and not as feature requests.
 
-## License ##
+## Status
+
+[![Build Status](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions/workflows/cron.yml/badge.svg)](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions)
+
+## License
 
 2023 Medical Access Uganda
 
@@ -115,4 +120,3 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <https://www.gnu.org/licenses/>.
-

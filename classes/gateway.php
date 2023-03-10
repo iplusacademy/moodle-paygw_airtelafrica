@@ -41,7 +41,7 @@ class gateway extends \core_payment\gateway {
      * @return array
      */
     public static function get_supported_currencies(): array {
-        // Not supported by Moodle: ZMW, CFA.
+        // Not yet supported by Moodle: ZMW MDL-77584.
         return ['UGX', 'NGN', 'TZS', 'KES', 'RWF', 'XOF', 'XAF', 'CDF', 'USD', 'XAF', 'SCR', 'MGA', 'MWK'];
     }
 
