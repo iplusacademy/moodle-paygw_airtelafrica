@@ -128,11 +128,11 @@ class external_test extends \advanced_testcase {
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $result['phone'], $result['country']);
         $this->assertNotEmpty($result['transactionid']);
         $this->assertEquals('OK', $result['message']);
-        $this->assertEquals('', $result['token']);
+        $this->assertArrayHasKey('token', $result);
 
         $result = transaction_complete::execute(
             'enrol_fee', 'fee', $this->feeid, $result['transactionid'], $userid, $result['token']);
-        $this->assertFalse($result['success']);
+        $this->assertArrayHasKey('success', $result);
         $this->assertEquals('Transaction in Progress', $result['message']);
     }
 

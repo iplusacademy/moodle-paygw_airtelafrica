@@ -99,7 +99,7 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
 
-        $result = $helper->make_refund(66666666, 'UGX');
+        $result = $helper->make_refund('66666666', 'UGX');
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
     }
@@ -167,7 +167,7 @@ class airtel_helper_test extends \advanced_testcase {
 
         // Cancel payment.
         $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $helper->token);
-        $result = $helper->make_refund(66666666, 'UGX');
+        $result = $helper->make_refund('66666666', 'UGX');
         $this->assertEquals(200, $result['status']['code']);
 
         $user = $this->getDataGenerator()->create_user(['country' => 'UG']);
@@ -211,11 +211,11 @@ class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Ping payment
-     * @param int $transactionid
+     * @param string $transactionid
      * @param string $token
      */
-    private function ping_payment(int $transactionid, string $token) {
-        if ($transactionid == 0) {
+    private function ping_payment(string $transactionid, string $token) {
+        if ($transactionid == '0') {
             throw new \moodle_exception('Invalid transaction id.');
         }
         $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $token);

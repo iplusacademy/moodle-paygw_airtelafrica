@@ -145,12 +145,12 @@ class airtel_helper {
     /**
      * Collection API: Refund.
      *
-     * @param int $airtelmoneyid
+     * @param string $airtelmoneyid
      * @param string $currency
      * @return array Formatted API response.
      */
-    public function make_refund(int $airtelmoneyid, string $currency): array {
-        if ($airtelmoneyid == 66666666) {
+    public function make_refund(string $airtelmoneyid, string $currency): array {
+        if ($airtelmoneyid == '66666666') {
             $result = [
                 'data' => [
                     'transaction' => [
@@ -164,7 +164,7 @@ class airtel_helper {
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
-        return $airtelmoneyid == 66666666 ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
+        return $airtelmoneyid == '66666666' ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
     }
 
     /**
@@ -205,7 +205,7 @@ class airtel_helper {
      */
     private function request_post(
         string $location, array $data, array $headers = [], string $verb = 'POST'): array {
-        $decoded = '';
+        $decoded = $result = '';
         $client = new \GuzzleHttp\Client();
         if ($this->token == '') {
             $authdata = ['client_id' => $this->clientid, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials'];
@@ -226,6 +226,8 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $result = substr($e->getMessage(), strpos($e->getMessage(), '{'));
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
             $result = substr($e->getMessage(), strpos($e->getMessage(), '{'));
         } finally {
             $decoded = json_decode($result, true);
