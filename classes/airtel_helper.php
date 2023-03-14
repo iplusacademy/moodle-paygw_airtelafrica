@@ -225,10 +225,9 @@ class airtel_helper {
         try {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $result = substr($e->getMessage(), strpos($e->getMessage(), '{'));
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $result = substr($e->getMessage(), strpos($e->getMessage(), '{'));
+        } catch (\Exception $e) {
+            // TODO: Bad gateway.
+            $result = $e->getMessage();
         } finally {
             $decoded = json_decode($result, true);
             // Trigger an event.

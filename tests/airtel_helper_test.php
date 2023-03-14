@@ -120,7 +120,7 @@ class airtel_helper_test extends \advanced_testcase {
         $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
 
         // Correct pin.
-        $result = $helper->request_payment($random, "course$random", 1000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "course$random", 100, 'UGX', $this->phone, 'UG');
         $token = $helper->token;
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
@@ -130,7 +130,7 @@ class airtel_helper_test extends \advanced_testcase {
 
         // Incorrect pin.
         $random = random_int(1000000000, 9999999999);
-        $result = $helper->request_payment($random, "course$random", 1000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "course$random", 100, 'UGX', $this->phone, 'UG');
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
         $transactionid = $result['data']['transaction']['id'];
