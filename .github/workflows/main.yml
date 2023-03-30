@@ -106,11 +106,14 @@ jobs:
             secret: ${{ secrets.secret }}
         run: moodle-plugin-ci --ansi phpunit --coverage-text --coverage-clover
 
-      - name: coveralls
+      - name: Uganda tests
         if: ${{ always() }}
-        run: moodle-plugin-ci coveralls-upload
         env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            phone: ${{ secrets.phone }}
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+        run: vendor/bin/phpunit --verbose --configuration payment/gateway/airtelafrica --testdox --debug
+        working-directory: moodle
 
       - name: privacy
         if: ${{ always() }}
