@@ -209,7 +209,10 @@ class airtel_helper {
                 $response = $client->request(
                     'POST',
                     $this->airtelurl . 'auth/oauth2/token',
-                    ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]);
+                    ['headers' => [
+                        'Content-Type' => 'application/json',
+                        'Extra-Tests' => 'Required_by_Airtel_Uganda'],
+                     'json' => $authdata]);
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -217,7 +220,10 @@ class airtel_helper {
                 return [];
             }
         }
-        $headers = array_merge($headers, ['Content-Type' => 'application/json', 'Authorization' => 'Bearer   ' . $this->token]);
+        $headers = array_merge($headers, [
+            'Content-Type' => 'application/json',
+            'Extra-tests' => 'Required_by_Airtel_Uganda',
+            'Authorization' => 'Bearer   ' . $this->token]);
         try {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
