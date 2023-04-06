@@ -103,7 +103,7 @@ Please contact you Airtel Africa representative in case you get invalid transact
 
 ## Status
 
-[![Build Status](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions/workflows/cron.yml/badge.svg)](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions)
+[![Build Status](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions/workflows/main.yml/badge.svg)](https://github.com/iplusacademy/moodle-paygw_airtelafrica/actions)
 
 ## License
 
