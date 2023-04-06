@@ -53,7 +53,7 @@ class gateway_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\gateway
      */
     public function test_gateway() {
-        $this->assertCount(13, gateway::get_supported_currencies());
+        $this->assertCount(14, gateway::get_supported_currencies());
         $errors = [];
         $gateway = $this->account->get_gateways()['airtelafrica'];
         $form = new \core_payment\form\account_gateway('', ['persistent' => $gateway]);
