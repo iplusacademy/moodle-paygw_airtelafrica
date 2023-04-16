@@ -102,6 +102,16 @@ class airtel_helper {
     }
 
     /**
+     * Are we testing?
+     *
+     * @param string $id
+     * @return bool
+     */
+    private function is_testing(string $id): bool {
+        return $this->testing && $id === '66666666';
+    }
+
+    /**
      * Collection API: Payments - USSD Push.
      *
      * @param int $transactionid
@@ -114,7 +124,7 @@ class airtel_helper {
      */
     public function request_payment(
         int $transactionid, string $reference, float $amount, string $currency, string $userphone, string $usercountry): array {
-        if ($userphone == '66666666') {
+        if ($this->is_testing($userphone)) {
             $result = [
                 'data' => [
                     'transaction' => ['id' => '8334msn88', 'status' => 'SUCCESS']],
@@ -139,7 +149,7 @@ class airtel_helper {
                 'country' => $this->country,
                 'currency' => $currency,
                 'id' => $transactionid]];
-        return $userphone == '66666666' ? $result : $this->request_post($location, $data, $headers);
+        return $this->is_testing($userphone) ? $result : $this->request_post($location, $data, $headers);
     }
 
     /**
@@ -150,7 +160,7 @@ class airtel_helper {
      * @return array Formatted API response.
      */
     public function make_refund(string $airtelmoneyid, string $currency): array {
-        if ($airtelmoneyid == '66666666') {
+        if ($this->is_testing($airtelmoneyid)) {
             $result = [
                 'data' => [
                     'transaction' => [
@@ -164,7 +174,7 @@ class airtel_helper {
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
-        return $airtelmoneyid == '66666666' ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
+        return $this->is_testing($airtelmoneyid) ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
     }
 
     /**
@@ -175,7 +185,7 @@ class airtel_helper {
      * @return array Formatted API response.
      */
     public function transaction_enquiry(string $transid, string $currency): array {
-        if ($transid == '66666666') {
+        if ($this->is_testing($transid)) {
             $result = [
                 'data' => [
                     'transaction' => [
@@ -191,7 +201,7 @@ class airtel_helper {
                     'success' => true]];
         }
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
-        return $transid == '66666666' ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
+        return $this->is_testing($transid) ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
     }
 
     /**
