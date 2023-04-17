@@ -84,7 +84,7 @@ class transaction_start extends external_api {
             'country' => $country,
         ]);
 
-        $config = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
         $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
         $amount = $payable->get_amount();
         $currency = $payable->get_currency();
@@ -92,18 +92,17 @@ class transaction_start extends external_api {
         $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
         $random = random_int(1000000000, 9999999999);
         $esb = 'ESB000001';
-        $transactionid = ($itemid == 66666666) ? $itemid : 0;
-        $helper = new \paygw_airtelafrica\airtel_helper(
-            $config->clientid, $config->secret, $config->country, '', $config->environment);
+        $transactionid = 0;
+        $helper = new \paygw_airtelafrica\airtel_helper($conf->clientid, $conf->secret, $conf->country, $conf->environment);
         $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
         if (array_key_exists('status', $result)) {
             if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
                 $transactionid = $result['data']['transaction']['id'];
             }
-            $esb = ($itemid == 66666666) ? 'ESB000010' : $result['status']['result_code'];
+            $esb = $result['status']['result_code'];
         }
         $message = $helper->esb_code($esb);
-        return ['transactionid' => $transactionid, 'message' => $message, 'token' => $helper->token];
+        return ['transactionid' => $transactionid, 'message' => $message];
     }
 
     /**
@@ -114,8 +113,7 @@ class transaction_start extends external_api {
     public static function execute_returns() {
         return new external_function_parameters([
             'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
-            'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
-            'token' => new external_value(PARAM_RAW, 'The Airtel token used'),
+            'message' => new external_value(PARAM_RAW, 'Usualy the error message')
         ]);
     }
 }

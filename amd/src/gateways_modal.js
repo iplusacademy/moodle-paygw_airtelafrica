@@ -102,7 +102,6 @@ export const process = (component, paymentArea, itemId, description) => {
                 if (airtelPay.transactionid > 0) {
                     console.log('Airtel Africa payment process started');  // eslint-disable-line
                     console.log('TransactionId: ' + airtelPay.transactionid);  // eslint-disable-line
-                    console.log('Token: ' + airtelPay.token);  // eslint-disable-line
                     const outDiv = modal.getRoot().find('#airtel-out');
                     const spinnerDiv = modal.getRoot().find('#airtel-spinner');
                     outDiv.append('<h4>TransactionId: ' + airtelPay.transactionid + '</h4>');

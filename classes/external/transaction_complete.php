@@ -55,7 +55,6 @@ class transaction_complete extends external_api {
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
             'orderid' => new external_value(PARAM_TEXT, 'The order id coming back from Airtel Africa'),
             'userid' => new external_value(PARAM_INT, 'The user who paid'),
-            'token' => new external_value(PARAM_TEXT, 'The airtel token we received'),
         ]);
     }
 
@@ -68,11 +67,10 @@ class transaction_complete extends external_api {
      * @param int $itemid An internal identifier that is used by the component
      * @param string $orderid Airtel Africa order ID
      * @param int $userid The user who paid
-     * @param string $token The Airtel token
      * @return array
      */
     public static function execute(
-        string $component, string $paymentarea, int $itemid, string $orderid, int $userid, string $token): array {
+        string $component, string $paymentarea, int $itemid, string $orderid, int $userid): array {
         global $DB;
         $gateway = 'airtelafrica';
 
@@ -82,18 +80,16 @@ class transaction_complete extends external_api {
             'itemid' => $itemid,
             'orderid' => $orderid,
             'userid' => $userid,
-            'token' => $token,
         ]);
-        $config = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
         $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
         $currency = $payable->get_currency();
         $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
         $amount = \core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
         $suc = false;
         $trans = 'TIP';
-        if ($config->clientid != '' && $config->secret != '') {
-            $helper = new \paygw_airtelafrica\airtel_helper(
-                $config->clientid, $config->secret, $config->country, $token, $config->environment);
+        if ($conf->clientid != '' && $conf->secret != '') {
+            $helper = new \paygw_airtelafrica\airtel_helper($conf->clientid, $conf->secret, $conf->country, $conf->environment);
             $result = $helper->transaction_enquiry($orderid, $currency);
             $status = self::array_helper('status', $result);
             $data = self::array_helper('data', $result);

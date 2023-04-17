@@ -78,16 +78,14 @@ class airtel_helper {
      * @param string $clientid The client id.
      * @param string $secret Airtel Africa secret.
      * @param string $country Airtel Africa location.
-     * @param string $token Airtel Africa token.
      * @param string $sandbox Whether we are working with the sandbox environment or not.
      */
     public function __construct(
-        string $clientid, string $secret, string $country = 'UG', string $token = '', string $sandbox = 'sandbox') {
+        string $clientid, string $secret, string $country = 'UG', string $sandbox = 'sandbox') {
         $this->clientid = $clientid;
         $this->secret = $secret;
         $this->airtelurl = self::get_baseurl($sandbox);
         $this->country = $country;
-        $this->token = $token;
         $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
     }
 

@@ -80,10 +80,9 @@ export const transactionStart = (component, paymentArea, itemId, ourReference, u
  * @param {number} itemId An internal identifier that is used by the component
  * @param {string} orderId The order id coming back from Airtel Africa
  * @param {number} userId The user who paid
- * @param {string} token Airtel token
  * @returns {Promise<{success: string, message: string}>}
  */
-export const transactionComplete = (component, paymentArea, itemId, orderId, userId, token) => {
+export const transactionComplete = (component, paymentArea, itemId, orderId, userId) => {
     const request = {
         methodname: 'paygw_airtelafrica_transaction_complete',
         args: {
@@ -91,8 +90,7 @@ export const transactionComplete = (component, paymentArea, itemId, orderId, use
             paymentarea: paymentArea,
             itemid: itemId,
             orderid: orderId,
-            userid: userId,
-            token,
+            userid: userId
         },
     };
 

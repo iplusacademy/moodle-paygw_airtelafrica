@@ -121,12 +121,11 @@ class airtel_helper_test extends \advanced_testcase {
 
         // Correct pin.
         $result = $helper->request_payment($random, "course$random", 100, 'UGX', $this->phone, 'UG');
-        $token = $helper->token;
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
         $transactionid = $result['data']['transaction']['id'];
 
-        $this->ping_payment((int)$transactionid, $token);
+        $this->ping_payment((int)$transactionid);
 
         // Incorrect pin.
         $random = random_int(1000000000, 9999999999);
@@ -134,7 +133,7 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(1, $result['status']['success']);
         $transactionid = $result['data']['transaction']['id'];
-        $this->ping_payment((int)$transactionid, $token);
+        $this->ping_payment((int)$transactionid);
     }
 
     /**
@@ -166,7 +165,7 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals('ESB000010', $result['status']['result_code']);
 
         // Cancel payment.
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $helper->token);
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
         $result = $helper->make_refund('66666666', 'UGX');
         $this->assertEquals(200, $result['status']['code']);
 
@@ -212,13 +211,12 @@ class airtel_helper_test extends \advanced_testcase {
     /**
      * Ping payment
      * @param string $transactionid
-     * @param string $token
      */
-    private function ping_payment(string $transactionid, string $token) {
+    private function ping_payment(string $transactionid) {
         if ($transactionid == '0') {
             throw new \moodle_exception('Invalid transaction id.');
         }
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG', $token);
+        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');
             if ($transactionid > 0 && array_key_exists('status', $result) && array_key_exists('data', $result)) {
