@@ -41,36 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                         'airtel_money_id' => $transaction['airtel_money_id']]];
                 $event = \paygw_airtelafrica\event\request_log::create($eventargs);
                 $event->trigger();
-                if ($transaction['status_code'] == 'TS') {
-                    $transactionid = $transaction['id'];
-                    mtrace('Enrol user with transaction id ' . $transactionid);
-                    // Sample code: component paymentarea itemid userid.
-                    $codes = explode(' ', $transaction['message']);
-                    $component = $codes[0];
-                    $paymentarea = $codes[1];
-                    $itemid = $codes[2];
-                    $userid = $codes[3];
-                    $payable = \core_payment\helper::get_payable(
-                        $component,
-                        $paymentarea,
-                        (int)$itemid);
-                    $paymentid = \core_payment\helper::save_payment(
-                        $payable->get_account_id(),
-                        $component,
-                        $paymentarea,
-                        (int)$itemid,
-                        (int)$userid,
-                        $payable->get_amount(),
-                        $payable->get_currency(),
-                        'airtelafrica');
-
-                    $record = new \stdClass();
-                    $record->paymentid = $paymentid;
-                    $record->pp_orderid = $transactionid;
-                    $record->money_id = $transaction['airtel_money_id'];
-                    $DB->insert_record('paygw_airtelafrica', $record);
-                    \core_payment\helper::deliver_order($paymentarea, $itemid, $paymentid, $userid);
-                }
             }
         }
     }
