@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->requires = 2022041200;
 $plugin->component = 'paygw_airtelafrica';
 $plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['local_aws' => ANY_VERSION];
-$plugin->supported = [401, 401];
+$plugin->supported = [402, 402];
 $plugin->release = 'v4.0.8';
 $plugin->version = 2023041800;

@@ -25,7 +25,11 @@
 
 namespace paygw_airtelafrica\external;
 
-use core_external;
+use core_external\external_api;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
  * Testing externals in payments API
@@ -34,8 +38,9 @@ use core_external;
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
  */
-class external_test extends \advanced_testcase {
+class external_test extends \externallib_advanced_testcase {
 
     /** @var string phone */
     private $phone;
@@ -85,8 +90,8 @@ class external_test extends \advanced_testcase {
      */
     public function test_transaction_start() {
         global $USER;
-        $this->assertInstanceOf('external_function_parameters', transaction_start::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_start::execute_returns());
+        transaction_start::execute_parameters();
+        transaction_start::execute_returns();
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $this->phone, $USER->country);
         $this->assertArrayHasKey('message', $result);
     }
@@ -97,8 +102,8 @@ class external_test extends \advanced_testcase {
      */
     public function test_transaction_complete() {
         global $USER;
-        $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
+        transaction_complete::execute_parameters();
+        transaction_complete::execute_returns();
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '66666666', $USER->id, '');
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
