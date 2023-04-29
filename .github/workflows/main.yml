@@ -40,6 +40,7 @@ jobs:
         with:
           path: this-plugin
           branch: matrix.moodle-branch
+          ref: matrix.moodle-branch
 
       - name: add plugin
         if: ${{ matrix.moodle-branch == 'MOODLE_401_STABLE' }}
