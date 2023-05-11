@@ -96,7 +96,6 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete() {
-        global $USER;
         $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '66666666');
@@ -127,7 +126,7 @@ class external_test extends \advanced_testcase {
 
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $result['phone'], $result['country']);
         $this->assertNotEmpty($result['transactionid']);
-        $this->assertEquals('OK', $result['message']);
+        $this->assertEquals('Your transaction has been successfully processed.', $result['message']);
 
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $result['transactionid'], $userid);
         $this->assertArrayHasKey('success', $result);

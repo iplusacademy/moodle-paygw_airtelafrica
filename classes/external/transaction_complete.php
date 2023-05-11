@@ -69,7 +69,7 @@ class transaction_complete extends external_api {
      */
     public static function execute(
         string $component, string $paymentarea, int $itemid, string $orderid): array {
-        global $COURSE, $DB, $USER;
+        global $DB, $USER;
         $gateway = 'airtelafrica';
 
         self::validate_parameters(self::execute_parameters(), [
@@ -98,12 +98,24 @@ class transaction_complete extends external_api {
                     $trans = $transaction['status'];
                     if ($transaction['status'] == 'TS') {
                         $paymentid = \core_payment\helper::save_payment(
-                            $payable->get_account_id(), $component, $paymentarea, $itemid, (int)$USER->id, (int)$amount, $currency, $gateway);
+                            $payable->get_account_id(),
+                            $component,
+                            $paymentarea,
+                            $itemid,
+                            (int)$USER->id,
+                            (int)$amount,
+                            $currency,
+                            $gateway);
                         $record = new \stdClass();
                         $record->paymentid = $paymentid;
                         $record->pp_orderid = $transaction['airtel_money_id'];
                         $suc = $DB->insert_record('paygw_airtelafrica', $record);
-                        $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, (int)$USER->id);
+                        $suc = $suc && \core_payment\helper::deliver_order(
+                            $component,
+                            $paymentarea,
+                            $itemid,
+                            $paymentid,
+                            (int)$USER->id);
                     }
                 }
             }

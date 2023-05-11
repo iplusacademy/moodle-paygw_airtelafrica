@@ -74,7 +74,7 @@ class transaction_start extends external_api {
     public static function execute(
         string $component, string $paymentarea, int $itemid, string $reference, string $phone, string $country): array {
 
-        global $COURSE, $USER;
+        global $USER;
         $gateway = 'airtelafrica';
         $esb = 'ESB000001';
         $transactionid = 0;
@@ -99,7 +99,11 @@ class transaction_start extends external_api {
                 $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
                 $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
                 $random = random_int(1000000000, 9999999999);
-                $helper = new \paygw_airtelafrica\airtel_helper($conf->clientid, $conf->secret, $conf->country, $conf->environment);
+                $helper = new \paygw_airtelafrica\airtel_helper(
+                    $conf->clientid,
+                    $conf->secret,
+                    $conf->country,
+                    $conf->environment);
                 $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
                 if (array_key_exists('status', $result)) {
                     if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
@@ -109,7 +113,7 @@ class transaction_start extends external_api {
                 }
             }
         }
-        $message = $helper->esb_code($esb);
+        $message = \paygw_airtelafrica\airtel_helper::esb_code($esb);
         return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => $message];
     }
 

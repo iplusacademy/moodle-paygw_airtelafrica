@@ -69,7 +69,7 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
         $this->assertEquals('Transaction Success', \paygw_airtelafrica\airtel_helper::ta_code('TS'));
         $this->assertEquals('In process', \paygw_airtelafrica\airtel_helper::dp_code('DP00800001006'));
-        $this->assertEquals('Something went wrong', \paygw_airtelafrica\airtel_helper::esb_code('ESB000001'));
+        $this->assertEquals('Something went wrong.', \paygw_airtelafrica\airtel_helper::esb_code('ESB000001'));
         $this->assertEquals('Invalid currency provided.', \paygw_airtelafrica\airtel_helper::rr_code('ROUTER112'));
         $random = random_int(1000000000, 9999999999);
         try {
