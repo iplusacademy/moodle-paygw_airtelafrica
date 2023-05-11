@@ -262,29 +262,6 @@ class airtel_helper {
     }
 
     /**
-     * Esb code
-     * @param string $code
-     * @return string
-     */
-    public static function esb_code(string $code): string {
-        $returns = [
-            'ESB000001' => 'Something went wrong.',
-            'ESB000004' => 'An error occurred while initiating the payment.',
-            'ESB000008' => 'Field validation.',
-            'ESB000011' => 'Transaction failed',
-            'ESB000010' => 'Your transaction has been successfully processed.',
-            'ESB000014' => 'An error occurred while fetching the transaction status.',
-            'ESB000033' => 'Invalid MSISDN Length. MSISDN Length should be ',
-            'ESB000034' => 'Invalid Country Name ',
-            'ESB000035' => 'Invalid Currency Code ',
-            'ESB000036' => 'Invalid MSISDN Length. MSISDN Length should be ? and should start with 0. ',
-            'ESB000039' => 'Vendor is not configured to do transaction in the country. ',
-            'ESB000041' => 'External Transaction ID already exists.',
-            'ESB000045' => 'No Transaction Found With Provided Transaction Id.'];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
-    }
-
-    /**
      * Return code
      * @param string $code
      * @return string

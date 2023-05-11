@@ -113,8 +113,7 @@ class transaction_start extends external_api {
                 }
             }
         }
-        $message = \paygw_airtelafrica\airtel_helper::esb_code($esb);
-        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => $message];
+        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => get_string($esb, 'paygw_airtelafrica')];
     }
 
     /**
