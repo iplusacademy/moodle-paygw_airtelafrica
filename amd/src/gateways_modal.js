@@ -117,9 +117,7 @@ export const process = (component, paymentArea, itemId, description) => {
                                 if (tip == 'TIP') {
                                     modal.setFooter('Step ' + el + '/10');
                                     Promise.all([
-                                        Repository.transactionComplete(
-                                            component, paymentArea, itemId, airtelPay.transactionid, airtelConfig.userid, el),
-                                    ])
+                                        Repository.transactionComplete(component, paymentArea, itemId, airtelPay.transactionid)])
                                     .then(([airtelPing]) => {
                                         modal.setFooter(airtelPing.message);
                                         console.log(airtelPing.message);  // eslint-disable-line

@@ -99,7 +99,7 @@ class external_test extends \advanced_testcase {
         global $USER;
         $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
-        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '66666666', $USER->id, '');
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '66666666');
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
     }

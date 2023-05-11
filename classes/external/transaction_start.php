@@ -73,7 +73,11 @@ class transaction_start extends external_api {
      */
     public static function execute(
         string $component, string $paymentarea, int $itemid, string $reference, string $phone, string $country): array {
+
+        global $COURSE, $USER;
         $gateway = 'airtelafrica';
+        $esb = 'ESB000001';
+        $transactionid = 0;
 
         self::validate_parameters(self::execute_parameters(), [
             'component' => $component,
@@ -84,25 +88,29 @@ class transaction_start extends external_api {
             'country' => $country,
         ]);
 
-        $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
-        $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
-        $amount = $payable->get_amount();
-        $currency = $payable->get_currency();
-        $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
-        $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
-        $random = random_int(1000000000, 9999999999);
-        $esb = 'ESB000001';
-        $transactionid = 0;
-        $helper = new \paygw_airtelafrica\airtel_helper($conf->clientid, $conf->secret, $conf->country, $conf->environment);
-        $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
-        if (array_key_exists('status', $result)) {
-            if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
-                $transactionid = $result['data']['transaction']['id'];
+        $user = \core_user::get_user($USER->id);
+        if ($user) {
+            $country = strtoupper($user->country);
+            if ($phone == $user->phone2 || $phone == $user->phone1) {
+                $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+                $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
+                $amount = $payable->get_amount();
+                $currency = $payable->get_currency();
+                $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
+                $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
+                $random = random_int(1000000000, 9999999999);
+                $helper = new \paygw_airtelafrica\airtel_helper($conf->clientid, $conf->secret, $conf->country, $conf->environment);
+                $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
+                if (array_key_exists('status', $result)) {
+                    if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
+                        $transactionid = $result['data']['transaction']['id'];
+                    }
+                    $esb = $result['status']['result_code'];
+                }
             }
-            $esb = $result['status']['result_code'];
         }
         $message = $helper->esb_code($esb);
-        return ['transactionid' => $transactionid, 'message' => $message];
+        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => $message];
     }
 
     /**
@@ -113,6 +121,7 @@ class transaction_start extends external_api {
     public static function execute_returns() {
         return new external_function_parameters([
             'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
+            'reference' => new external_value(PARAM_RAW, 'A reference'),
             'message' => new external_value(PARAM_RAW, 'Usualy the error message')
         ]);
     }

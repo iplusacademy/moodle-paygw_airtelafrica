@@ -53,8 +53,7 @@ class transaction_complete extends external_api {
             'component' => new external_value(PARAM_COMPONENT, 'The component name'),
             'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
-            'orderid' => new external_value(PARAM_TEXT, 'The order id coming back from Airtel Africa'),
-            'userid' => new external_value(PARAM_INT, 'The user who paid'),
+            'orderid' => new external_value(PARAM_TEXT, 'The order id coming back from Airtel Africa')
         ]);
     }
 
@@ -66,12 +65,11 @@ class transaction_complete extends external_api {
      * @param string $paymentarea The payment area
      * @param int $itemid An internal identifier that is used by the component
      * @param string $orderid Airtel Africa order ID
-     * @param int $userid The user who paid
      * @return array
      */
     public static function execute(
-        string $component, string $paymentarea, int $itemid, string $orderid, int $userid): array {
-        global $DB;
+        string $component, string $paymentarea, int $itemid, string $orderid): array {
+        global $COURSE, $DB, $USER;
         $gateway = 'airtelafrica';
 
         self::validate_parameters(self::execute_parameters(), [
@@ -79,7 +77,6 @@ class transaction_complete extends external_api {
             'paymentarea' => $paymentarea,
             'itemid' => $itemid,
             'orderid' => $orderid,
-            'userid' => $userid,
         ]);
         $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
         $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
@@ -101,13 +98,12 @@ class transaction_complete extends external_api {
                     $trans = $transaction['status'];
                     if ($transaction['status'] == 'TS') {
                         $paymentid = \core_payment\helper::save_payment(
-                            $payable->get_account_id(), $component, $paymentarea, $itemid, $userid, $amount, $currency, $gateway);
-
+                            $payable->get_account_id(), $component, $paymentarea, $itemid, (int)$USER->id, (int)$amount, $currency, $gateway);
                         $record = new \stdClass();
                         $record->paymentid = $paymentid;
                         $record->pp_orderid = $transaction['airtel_money_id'];
                         $suc = $DB->insert_record('paygw_airtelafrica', $record);
-                        $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
+                        $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, (int)$USER->id);
                     }
                 }
             }
