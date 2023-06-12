@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Checks.
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\check;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['local_aws' => ANY_VERSION];
-$plugin->supported = [401, 401];
-$plugin->release = 'v4.1.0';
-$plugin->version = 2023061200;
+use core\check\check;
+use core\check\result;
+
+/**
+ * Checks.
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class airtelafrica extends check {
+
+    /**
+     * Collect result.
+     *
+     * @return result
+     */
+    public function get_result(): result {
+        $summary = get_string('check_warning', 'paygw_airtelafrica');
+        $details = get_string('check_details', 'paygw_airtelafrica');
+        return new result(result::WARNING, $summary, $details);
+    }
+}

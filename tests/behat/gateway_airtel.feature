@@ -89,7 +89,8 @@ Feature: Airtel Africa payment gateway
     And I should see "789012"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
-    And I wait "1" seconds
+    # Cannot wait in GitHub actions.
+    # And I wait "1" seconds
     And I click on "Cancel" "button" in the "Airtel Africa" "dialogue"
     Then I should see "This course requires a payment for entry."
 

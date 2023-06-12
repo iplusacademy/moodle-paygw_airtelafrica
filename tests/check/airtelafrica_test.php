@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Testing security checks
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\check;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['local_aws' => ANY_VERSION];
-$plugin->supported = [401, 401];
-$plugin->release = 'v4.1.0';
-$plugin->version = 2023061200;
+/**
+ * Testing security checks
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class airtelafrica_test extends \advanced_testcase {
+
+    /**
+     * Test checks.
+     * @covers \paygw_airtelafrica\check\airtelafrica
+     */
+    public function test_checks() {
+        global $CFG;
+        require_once($CFG->dirroot . '/payment/gateway/airtelafrica/lib.php');
+        $checks = paygw_airtelafrica_security_checks();
+        $this->assertCount(1, $checks);
+        $check = new \paygw_airtelafrica\check\airtelafrica();
+        $this->assertEquals('warning', $check->get_result()->get_status());
+        $this->assertEmpty($check->get_action_link());
+    }
+}
