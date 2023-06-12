@@ -37,6 +37,9 @@ use core_external;
  */
 class external_test extends \advanced_testcase {
 
+    /** @var config configuration */
+    private $config;
+
     /** @var string phone */
     private $phone;
 
@@ -50,7 +53,7 @@ class external_test extends \advanced_testcase {
     protected function setUp(): void {
         global $DB;
         $this->resetAfterTest(true);
-        $this->phone = getenv('phone') ? getenv('phone') : '66666666';
+        $this->phone = getenv('phone') ? getenv('phone') : '666666666';
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
         $course = $generator->create_course();
@@ -60,11 +63,14 @@ class external_test extends \advanced_testcase {
         $this->feeid = $feeplugin->add_instance($course, $data);
         $config = new \stdClass();
         $config->clientid = getenv('login') ? getenv('login') : 'fakelogin';
+        $config->clientidsb = getenv('login') ? getenv('login') : 'fakelogin';
         $config->brandname = 'maul';
         $config->environment = 'sandbox';
         $config->secret = getenv('secret') ? getenv('secret') : 'fakesecret';
+        $config->secretsb = getenv('secret') ? getenv('secret') : 'fakesecret';
         $config->country = 'UG';
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
+        $this->config = (array)$config;
         $this->setUser($user);
     }
 
@@ -84,53 +90,63 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_start
      */
     public function test_transaction_start() {
-        global $USER;
         $this->assertInstanceOf('external_function_parameters', transaction_start::execute_parameters());
         $this->assertInstanceOf('external_single_structure', transaction_start::execute_returns());
-        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $this->phone, $USER->country);
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
+        $this->assertArrayHasKey('message', $result);
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertArrayHasKey('message', $result);
     }
 
     /**
      * Test external transaction complete.
+     * @covers \paygw_airtelafrica\external\transaction_start
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete() {
         $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
-        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '66666666');
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666', 'UGX');
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
     }
 
     /**
      * Test complete cycle.
+     * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\external\get_config_for_js
      * @covers \paygw_airtelafrica\external\transaction_start
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_complete_cycle() {
-        global $USER;
+        if ($this->config['clientidsb'] == 'fakelogin') {
+            $this->markTestSkipped('No login credentials');
+        }
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $clientid = getenv('login') ? getenv('login') : 'fakelogin';
+        $currency = $result['currency'];
         $this->assertEquals($clientid, $result['clientid']);
         $this->assertEquals('maul', $result['brandname']);
         $this->assertEquals('UG', $result['country']);
         $this->assertEquals(66, $result['cost']);
-        $this->assertEquals('UGX', $result['currency']);
+        $this->assertEquals('UGX', $currency);
         $this->assertEquals($this->phone, $result['phone']);
         $this->assertEquals('UG', $result['usercountry']);
-        $this->assertEquals($USER->id, $result['userid']);
         $this->assertNotEmpty($result['reference']);
-        $userid = $result['userid'];
 
-        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $result['phone'], $result['country']);
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertNotEmpty($result['transactionid']);
         $this->assertEquals('Your transaction has been successfully processed.', $result['message']);
 
-        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $result['transactionid'], $userid);
+        $transactionid = $result['transactionid'];
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $transactionid, $currency);
         $this->assertArrayHasKey('success', $result);
         $this->assertEquals('Transaction in Progress', $result['message']);
+
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $transactionid, $currency);
+        $this->assertArrayHasKey('success', $result);
+        $this->assertEquals('Transaction Success', $result['message']);
     }
 
     /**

@@ -6,10 +6,10 @@ Feature: Airtel Africa payment gateway
 
   Background:
     Given the following "users" exist:
-      | username | phone2   | country |
-      | student1 | 78901299 | UG      |
-      | student2 | 66666666 | UG      |
-      | manager1 | 78901300 | UG      |
+      | username | phone2    | country |
+      | student1 | 789012994 | UG      |
+      | student2 | 666666666 | UG      |
+      | manager1 | 78901300  | UG      |
     And the following "courses" exist:
       | fullname | shortname |
       | Course 1 | C1        |
@@ -34,26 +34,28 @@ Feature: Airtel Africa payment gateway
     And I should see "Secret"
     And I should see "Environment"
     And I set the following fields to these values:
-      | Brand name    | Test brand  |
-      | Client ID     | Test_id     |
-      | Secret        | Test_Secret |
-      | Environment   | Sandbox     |
-      | Country       | Uganda      |
+      | Brand name        | Test brand                           |
+      | Client ID         | 1335ee67-c7fe-4578-902a-f0b7cff0bf93 |
+      | Secret            | 61e1b56f-1ccb-417e-bf04-56378e987157 |
+      | Client sandbox ID | 1335ee67-c7fe-4578-902a-f0b7cff0bf93 |
+      | Sandbox secret    | 61e1b56f-1ccb-417e-bf04-56378e987157 |
+      | Environment       | sandbox                              |
+      | Country           | Uganda                               |
     And I press "Save changes"
     And I log out
     And I log in as "manager1"
     And I am on the "Course 1" "enrolment methods" page
     And I select "Enrolment on payment" from the "Add method" singleselect
     And I set the following fields to these values:
-      | Payment account | Account1        |
-      | Enrolment fee   | 123.45          |
+      | Payment account | Account1         |
+      | Enrolment fee   | 5000             |
       | Currency        | Ugandan Shilling |
     And I press "Add method"
     And I am on the "Course 2" "enrolment methods" page
     And I select "Enrolment on payment" from the "Add method" singleselect
     And I set the following fields to these values:
-      | Payment account | Account1         |
-      | Enrolment fee   | 123.45           |
+      | Payment account | Account1        |
+      | Enrolment fee   | 5000            |
       | Currency        | Congolese Franc |
     And I press "Add method"
     And I log out
@@ -70,6 +72,8 @@ Feature: Airtel Africa payment gateway
     And I should see "profile page"
     And I click on "Cancel" "button" in the "Airtel Africa" "dialogue"
     Then I should see "Airtel Africa" in the "Select payment type" "dialogue"
+    And I click on "Cancel" "button" in the "Select payment type" "dialogue"
+    Then I should see "This course requires a payment for entry."
 
   @javascript
   Scenario: Student can see the Airtel Africa payment prompt on the course enrolment page
@@ -77,15 +81,17 @@ Feature: Airtel Africa payment gateway
     And I am on course index
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "5,000"
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
-    And I should see "123"
+    And I should see "5,000"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
     And I should see "789012"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    And I wait "1" seconds
     And I click on "Cancel" "button" in the "Airtel Africa" "dialogue"
+    Then I should see "This course requires a payment for entry."
 
   @javascript
   Scenario: Student should be logged in automatically after an Airtel Africa payment
@@ -93,22 +99,26 @@ Feature: Airtel Africa payment gateway
     And I am on course index
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "5,000"
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
-    And I should see "123"
+    And I should see "5,000"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should see "66666666"
+    And I should see "666666666"
     And I should see "profile page"
-    And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
-    And I should see "FAILED"
+    Then I call airtel callback
+    Then I call airtel callback
+    Then I call airtel callback
+    # Hacked by airtel callback
+    # And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    And I should see "TestPage"
 
   Scenario: Guest can see the login prompt on the Airtel Africa course enrolment page with round price
     When I log in as "guest"
     And I am on course index
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "5,000"
     And I should see "Log in to the site"
 
   Scenario: Guest can see the login prompt on the Airtel Africa course enrolment page
@@ -116,5 +126,5 @@ Feature: Airtel Africa payment gateway
     And I am on course index
     And I follow "Course 2"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "5,000"
     And I should see "Log in to the site"

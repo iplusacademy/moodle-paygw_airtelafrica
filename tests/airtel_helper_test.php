@@ -36,14 +36,11 @@ namespace paygw_airtelafrica;
 class airtel_helper_test extends \advanced_testcase {
 
 
+    /** @var config configuration */
+    private $config;
+
     /** @var string phone */
     private $phone;
-
-    /** @var string login */
-    private $login;
-
-    /** @var string secret */
-    private $secret;
 
     /** @var string base */
     protected $base = 'https://openapiuat.airtel.africa/';
@@ -54,9 +51,8 @@ class airtel_helper_test extends \advanced_testcase {
     protected function setUp(): void {
         $this->resetAfterTest(true);
         set_config('country', 'UG');
+        $this->config = ['environment' => 'sandbox', 'clientidsb' => getenv('login'), 'secretsb' => getenv('secret')];
         $this->phone = getenv('phone');
-        $this->login = getenv('login');
-        $this->secret = getenv('secret');
     }
 
     /**
@@ -65,14 +61,14 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      */
     public function test_empty_helper() {
-        $helper = new \paygw_airtelafrica\airtel_helper('fake', 'user');
+        $helper = new airtel_helper($this->config);
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
-        $this->assertEquals('Transaction Success', \paygw_airtelafrica\airtel_helper::ta_code('TS'));
-        $this->assertEquals('In process', \paygw_airtelafrica\airtel_helper::dp_code('DP00800001006'));
-        $this->assertEquals('Invalid currency provided.', \paygw_airtelafrica\airtel_helper::rr_code('ROUTER112'));
+        $this->assertEquals('Transaction Success', airtel_helper::ta_code('TS'));
+        $this->assertEquals('In process', airtel_helper::dp_code('DP00800001006'));
+        $this->assertEquals('Invalid currency provided.', airtel_helper::rr_code('ROUTER112'));
         $random = random_int(1000000000, 9999999999);
         try {
-            $helper->request_payment($random, "course$random", 1000, 'UGX', '1234567', 'BE');
+            $helper->request_payment($random, "course$random", 1000, 'UGX', '666666666', 'BE');
         } catch (\moodle_exception $e) {
             $this->assertEquals('Exception - Invalid country code provided.', $e->getmessage());
         }
@@ -84,21 +80,21 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      */
     public function test_callback_manualy() {
-        $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => '66666666']);
+        $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => '666666666']);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret);
+        $helper = new airtel_helper($this->config);
 
-        $result = $helper->request_payment($random, "course$random", 1000, 'UGX', '66666666', 'UG');
+        $result = $helper->request_payment($random, "course$random", 1000, 'UGX', '666666666', 'UG');
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
 
-        $result = $helper->transaction_enquiry('66666666', 'UGX');
+        $result = $helper->transaction_enquiry('666666666', 'UGX');
         $this->assertEquals('TS', $result['data']['transaction']['status']);
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
 
-        $result = $helper->make_refund('66666666', 'UGX');
+        $result = $helper->make_refund('666666666', 'UGX');
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
     }
@@ -110,13 +106,13 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      */
     public function test_airtel_manualy() {
-        if ($this->login == '') {
+        if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
+        $helper = new airtel_helper($this->config);
 
         // Correct pin.
         $result = $helper->request_payment($random, "course$random", 100, 'UGX', $this->phone, 'UG');
@@ -141,13 +137,13 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      */
     public function test_airtel_payment() {
-        if ($this->login == '') {
+        if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
+        $helper = new airtel_helper($this->config);
 
         // Make payment.
         $result = $helper->request_payment($random, "course$random", 66, 'UGX', $this->phone, 'UG');
@@ -164,8 +160,8 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals('ESB000010', $result['status']['result_code']);
 
         // Cancel payment.
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
-        $result = $helper->make_refund('66666666', 'UGX');
+        $helper = new airtel_helper($this->config);
+        $result = $helper->make_refund('666666666', 'UGX');
         $this->assertEquals(200, $result['status']['code']);
 
         $user = $this->getDataGenerator()->create_user(['country' => 'UG']);
@@ -215,7 +211,7 @@ class airtel_helper_test extends \advanced_testcase {
         if ($transactionid == '0') {
             throw new \moodle_exception('Invalid transaction id.');
         }
-        $helper = new \paygw_airtelafrica\airtel_helper($this->login, $this->secret, 'UG');
+        $helper = new airtel_helper($this->config);
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');
             if ($transactionid > 0 && array_key_exists('status', $result) && array_key_exists('data', $result)) {

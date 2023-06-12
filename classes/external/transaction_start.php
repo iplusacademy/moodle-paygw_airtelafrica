@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace paygw_airtelafrica\external;
 
+use core_payment\helper;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -53,9 +54,6 @@ class transaction_start extends external_api {
             'component' => new external_value(PARAM_COMPONENT, 'The component name'),
             'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
-            'reference' => new external_value(PARAM_RAW, 'The reference we use'),
-            'phone' => new external_value(PARAM_RAW, 'The phone of the payer'),
-            'country' => new external_value(PARAM_RAW, 'The country of the payer'),
         ]);
     }
 
@@ -66,52 +64,47 @@ class transaction_start extends external_api {
      * @param string $component Name of the component that the itemid belongs to
      * @param string $paymentarea
      * @param int $itemid An internal identifier that is used by the component
-     * @param string $reference
-     * @param string $phone
-     * @param string $country
      * @return array
      */
-    public static function execute(
-        string $component, string $paymentarea, int $itemid, string $reference, string $phone, string $country): array {
-
-        global $USER;
+    public static function execute(string $component, string $paymentarea, int $itemid): array {
+        global $DB;
         $gateway = 'airtelafrica';
-        $esb = 'ESB000001';
-        $transactionid = 0;
+        $transactionid = '0';
 
         self::validate_parameters(self::execute_parameters(), [
             'component' => $component,
             'paymentarea' => $paymentarea,
             'itemid' => $itemid,
-            'reference' => $reference,
-            'phone' => $phone,
-            'country' => $country,
         ]);
 
-        $user = \core_user::get_user($USER->id);
-        if ($user) {
-            $country = strtoupper($user->country);
-            if ($phone == $user->phone2 || $phone == $user->phone1) {
-                $conf = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
-                $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
-                $amount = $payable->get_amount();
-                $currency = $payable->get_currency();
-                $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
-                $cost = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge);
-                $random = random_int(1000000000, 9999999999);
-                $helper = new \paygw_airtelafrica\airtel_helper(
-                    $conf->clientid,
-                    $conf->secret,
-                    $conf->country,
-                    $conf->environment);
-                $result = $helper->request_payment($random, $reference, $cost, $currency, $phone, $country);
-                if (array_key_exists('status', $result)) {
-                    if ($result['status']['code'] == 200 && $result['status']['success'] == 1) {
-                        $transactionid = $result['data']['transaction']['id'];
-                    }
-                    $esb = $result['status']['result_code'];
-                }
+        $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $helper = new airtel_helper($config);
+        $user = $helper->current_user_data();
+        $userid = $user['id'];
+        $payable = helper::get_payable($component, $paymentarea, $itemid);
+        $amount = $payable->get_amount();
+        $currency = $payable->get_currency();
+        $surcharge = helper::get_gateway_surcharge($gateway);
+        $cost = helper::get_rounded_cost($amount, $currency, $surcharge);
+        $reference = $itemid . '_' . $userid;
+        $random = random_int(1000000000, 9999999999);
+        $result = $helper->request_payment($random, $reference, $cost, $currency, $user['phone'], $user['country']);
+        $status = array_key_exists('status', $result) ? $result['status'] : false;
+        $data = array_key_exists('data', $result) ? $result['data'] : false;
+        $esb = $status ? $status['result_code'] : 'ESB000001';
+        if ($status && $status['code'] == '200' && $esb == 'ESB000010') {
+            $cond = ['paymentid' => $itemid, 'userid' => $userid];
+            if ($DB->record_exists('paygw_airtelafrica', $cond)) {
+                $DB->delete_records('paygw_airtelafrica', $cond);
             }
+            $transactionid = $data['transaction']['id'] ?? '0';
+            $data = new \stdClass;
+            $data->paymentid = $itemid;
+            $data->userid = $userid;
+            $data->transactionid = $transactionid;
+            $data->moneyid = $helper->token;
+            $data->timecreated = time();
+            $DB->insert_record('paygw_airtelafrica', $data);
         }
         return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => get_string($esb, 'paygw_airtelafrica')];
     }

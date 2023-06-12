@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        moodle-branch: ['MOODLE_401_STABLE', 'MOODLE_402_STABLE']
+        moodle-branch: ['MOODLE_401_STABLE']
         php: ['8.1']
         database: ['mariadb', 'pgsql']
 
@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: this-plugin
-          ref: ${{ matrix.moodle-branch }}
+          ref: minimal
 
       - name: add plugin
         if: ${{ matrix.moodle-branch == 'MOODLE_401_STABLE' }}

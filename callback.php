@@ -25,24 +25,73 @@
 
 // @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../config.php');
+global $CFG, $DB, $USER;
+require_once($CFG->dirroot . '/course/lib.php');
 
-if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    http_response_code(405);
-} else {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Handles callbacks done by Airtel Africa.
     if ($response = json_decode(file_get_contents('php://input'), true)) {
-        if (isset($response['transaction'])) {
-            $transaction = $response['transaction'];
-            if (isset($transaction['status_code'])) {
+        $gateway = 'airtelafrica';
+        $table = 'paygw_airtelafrica';
+        $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $response);
+        if ($transaction) {
+            $transactionid = \paygw_airtelafrica\airtel_helper::array_helper('id', $transaction) ?? '';
+            $cond = ['transactionid' => $transactionid];
+            if ($transactionid != '' && $DB->record_exists($table, $cond)) {
+                $payrec = $DB->get_record($table, $cond);
+                $msg = \paygw_airtelafrica\airtel_helper::array_helper('message', $transaction) ?? 'Unknown';
+                $mid = \paygw_airtelafrica\airtel_helper::array_helper('airtel_money_id', $transaction) ?? '';
+                $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => 'fee', 'id' => $payrec->paymentid]);
                 $eventargs = [
-                    'context' => \context_system::instance(),
-                    'other' => [
-                        'message' => $transaction['message'],
-                        'id' => $transaction['id'],
-                        'airtel_money_id' => $transaction['airtel_money_id']]];
-                $event = \paygw_airtelafrica\event\request_log::create($eventargs);
-                $event->trigger();
+                    'context' => \context_course::instance($courseid),
+                    'userid' => $payrec->userid,
+                    'other' => ['message' => $msg, 'id' => $tid, 'airtel_money_id' => $mid]];
+                \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
+                $conf = \core_payment\helper::get_gateway_configuration('enrol_fee', 'fee', $payrec->paymentid, $gateway);
+                $helper = new \paygw_airtelafrica\airtel_helper($conf);
+                $payable = \core_payment\helper::get_payable('enrol_fee', 'fee', $payrec->paymentid);
+                $currency = $payable->get_currency();
+                $result = [
+                    'data' => [
+                        'transaction' => [
+                               'airtel_money_id' => 'C3648.00993.538XX.XX67',
+                               'id' => '666666666',
+                               'message' => 'success',
+                               'status' => 'TS']],
+                    'status' => [
+                        'code' => '200',
+                        'message' => 'SUCCESS',
+                        'result_code' => 'ESB000010',
+                        'response_code' => 'DP00800001006',
+                        'success' => true]];
+                $result = $helper->transaction_enquiry($transactionid, $currency);
+                $status = \paygw_airtelafrica\airtel_helper::array_helper('status', $result);
+                $data = \paygw_airtelafrica\airtel_helper::array_helper('data', $result);
+                if ($status && $data && $status['code'] == '200' && $status['success']) {
+                    $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $data);
+                    if ($transaction && $transaction['status'] == 'TS') {
+                        $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
+                        $amount = (int)\core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+                        $DB->set_field('paygw_airtelafrica', 'timecompleted', time(), $cond);
+                        $DB->set_field('paygw_airtelafrica', 'moneyid', $mid, $cond);
+                        try {
+                            $paymentid = \core_payment\helper::save_payment(
+                                $payable->get_account_id(),
+                                'enrol_fee',
+                                'fee',
+                                $transactionid,
+                                $payrec->userid,
+                                $amount,
+                                $currency,
+                                $gateway);
+                            \core_payment\helper::deliver_order('enrol_fee', 'fee', $transactionid, $paymentid, $payrec->userid);
+                        } catch (Exception $e) {
+                            die($e->getMessage());
+                        }
+                    }
+                }
             }
         }
     }
 }
-die;
+die();

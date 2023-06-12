@@ -32,6 +32,7 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
+use paygw_airtelafrica\airtel_helper;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
@@ -68,40 +69,25 @@ class get_config_for_js extends external_api {
      * @return string[]
      */
     public static function execute(string $component, string $paymentarea, int $itemid): array {
-        global $USER;
+
         $gateway = 'airtelafrica';
-        self::validate_parameters(self::execute_parameters(), [
-            'component' => $component,
-            'paymentarea' => $paymentarea,
-            'itemid' => $itemid,
-        ]);
-        $phone = get_string('statusunknown');
-        $country = 'UG';
-        $userid = 1;
-        $user = \core_user::get_user($USER->id);
-        if ($user) {
-            $userid = $user->id;
-            $country = strtoupper($user->country);
-            $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
-        }
-        $config = (object)helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $arr = ['component' => $component, 'paymentarea' => $paymentarea, 'itemid' => $itemid];
+        self::validate_parameters(self::execute_parameters(), $arr);
+
+        $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $helper = new airtel_helper($config);
+        $user = $helper->current_user_data();
         $payable = helper::get_payable($component, $paymentarea, $itemid);
-        $amount = $payable->get_amount();
         $currency = $payable->get_currency();
-        $surcharge = helper::get_gateway_surcharge($gateway);
-        $cost = helper::get_rounded_cost($amount, $currency, $surcharge);
-        $reference = "$component $paymentarea $itemid $userid";
         return [
-            'clientid' => $config->clientid,
-            'brandname' => $config->brandname,
-            'country' => $config->country,
-            'cost' => $cost,
+            'clientid' => $helper->clientid,
+            'brandname' => $config['brandname'],
+            'country' => $config['country'],
+            'cost' => helper::get_rounded_cost($payable->get_amount(), $currency, helper::get_gateway_surcharge($gateway)),
             'currency' => $currency,
-            'phone' => $phone,
-            'usercountry' => $country,
-            'userid' => $userid,
-            'reference' => $reference,
-        ];
+            'phone' => $user['phone'],
+            'usercountry' => $user['country'],
+            'reference' => implode(' ', [$itemid, $user['id'], $helper->sandbox])];
     }
 
     /**
@@ -118,7 +104,6 @@ class get_config_for_js extends external_api {
             'currency' => new external_value(PARAM_TEXT, 'Currency'),
             'phone' => new external_value(PARAM_TEXT, 'User mobile phone'),
             'usercountry' => new external_value(PARAM_TEXT, 'User country'),
-            'userid' => new external_value(PARAM_INT, 'User id'),
             'reference' => new external_value(PARAM_TEXT, 'Reference'),
         ]);
     }

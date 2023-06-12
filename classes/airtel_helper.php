@@ -26,7 +26,6 @@
 namespace paygw_airtelafrica;
 
 use curl;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
@@ -50,17 +49,22 @@ class airtel_helper {
     /**
      * @var string Client ID
      */
-    private $clientid;
+    public $clientid;
 
     /**
      * @var string Airtel Africa App secret
      */
-    private $secret;
+    public $secret;
 
     /**
      * @var string The country where Airtel Africa client is located
      */
-    private $country;
+    public $country;
+
+    /**
+     * @var bool Sandbox
+     */
+    public $sandbox;
 
     /**
      * @var string The oath bearer token
@@ -73,30 +77,30 @@ class airtel_helper {
     public $testing;
 
     /**
-     * helper constructor.
+     * Helper constructor.
      *
-     * @param string $clientid The client id.
-     * @param string $secret Airtel Africa secret.
+     * @param array $config The gateway configuration.
      * @param string $country Airtel Africa location.
-     * @param string $sandbox Whether we are working with the sandbox environment or not.
      */
-    public function __construct(
-        string $clientid, string $secret, string $country = 'UG', string $sandbox = 'sandbox') {
-        $this->clientid = $clientid;
-        $this->secret = $secret;
-        $this->airtelurl = self::get_baseurl($sandbox);
-        $this->country = $country;
+    public function __construct(array $config, string $country = 'UG') {
+        $this->sandbox = strtolower($config['environment']) == 'sandbox';
+        $this->clientid = $config[$this->sandbox ? 'clientidsb' : 'clientid'];
+        $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
+        $this->airtelurl = $this::get_baseurl();
+        $this->country = array_key_exists('country', $config) ? $config['country'] : $country;
         $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
+        if ($this->testing) {
+            $this->sandbox = true;
+        }
     }
 
     /**
      * Which url should be used.
      *
-     * @param string $sandbox
      * @return string
      */
-    private static function get_baseurl(string $sandbox): string {
-        return $sandbox == 'sandbox' ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
+    private function get_baseurl(): string {
+        return $this->sandbox ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
     }
 
     /**
@@ -106,7 +110,7 @@ class airtel_helper {
      * @return bool
      */
     private function is_testing(string $id): bool {
-        return $this->testing && $id === '66666666';
+        return (bool)($this->testing && $id == '666666666');
     }
 
     /**
@@ -125,7 +129,7 @@ class airtel_helper {
         if ($this->is_testing($userphone)) {
             $result = [
                 'data' => [
-                    'transaction' => ['id' => '8334msn88', 'status' => 'SUCCESS']],
+                    'transaction' => ['id' => '666666666', 'status' => 'SUCCESS']],
                     'status' => [
                         'code' => '200',
                         'message' => 'SUCCESS',
@@ -137,9 +141,9 @@ class airtel_helper {
         $location = 'merchant/v1/payments/';
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = [
-            'reference' => $reference,
+            'reference' => \core_text::substr($reference, 0, 25),
             'subscriber' => [
-                'country' => strtoupper($usercountry),
+                'country' => \core_text::strtoupper($usercountry),
                 'currency' => $currency,
                 'msisdn' => $userphone],
             'transaction' => [
@@ -188,11 +192,11 @@ class airtel_helper {
                 'data' => [
                     'transaction' => [
                            'airtel_money_id' => 'C3648.00993.538XX.XX67',
-                           'id' => '8334msn88',
+                           'id' => '666666666',
                            'message' => 'success',
                            'status' => 'TS']],
                 'status' => [
-                    'code' => 200,
+                    'code' => '200',
                     'message' => 'SUCCESS',
                     'result_code' => 'ESB000010',
                     'response_code' => 'DP00800001006',
@@ -211,8 +215,7 @@ class airtel_helper {
      * @param string $verb
      * @return array Decoded API response.
      */
-    private function request_post(
-        string $location, array $data, array $headers = [], string $verb = 'POST'): array {
+    private function request_post(string $location, array $data, array $headers = [], string $verb = 'POST'): array {
         $decoded = $result = '';
         $client = new \GuzzleHttp\Client();
         if ($this->token == '') {
@@ -300,5 +303,35 @@ class airtel_helper {
             'ROUTER116' => 'The encrypted value of the pin is incorrect. Kindly re-check the encryption mechanism.',
             'ROUTER117' => 'An error occurred while generating the response.'];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
+    }
+
+    /**
+     * Array helper.
+     *
+     * @param string $key
+     * @param array $arr
+     * @return array||bool
+     */
+    public static function array_helper(string $key, array $arr) {
+        return (array_key_exists($key, $arr)) ? $arr[$key] : false;
+    }
+
+    /**
+     * Phone helper.
+     *
+     * @return array
+     */
+    public function current_user_data() {
+        global $USER;
+        $arr = [];
+        $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
+        if ($user) {
+            $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
+            $phone = preg_replace("/[^0-9]/", '', $phone);
+            if (strlen($phone) > 5) {
+                $arr = ['id' => $user->id, 'country' => strtoupper($user->country), 'phone' => $phone];
+            }
+        }
+        return $arr;
     }
 }
