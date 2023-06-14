@@ -86,7 +86,7 @@ class transaction_start extends external_api {
         $currency = $payable->get_currency();
         $surcharge = helper::get_gateway_surcharge($gateway);
         $cost = helper::get_rounded_cost($amount, $currency, $surcharge);
-        $reference = $itemid . '_' . $userid;
+        $reference = $component . '_' . $itemid . '_' . $userid;
         $random = random_int(1000000000, 9999999999);
         $result = $helper->request_payment($random, $reference, $cost, $currency, $user['phone'], $user['country']);
         $status = array_key_exists('status', $result) ? $result['status'] : false;
@@ -106,7 +106,7 @@ class transaction_start extends external_api {
             $data->timecreated = time();
             $DB->insert_record('paygw_airtelafrica', $data);
         }
-        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => get_string($esb, 'paygw_airtelafrica')];
+        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => airtel_helper::esb_code($esb)];
     }
 
     /**

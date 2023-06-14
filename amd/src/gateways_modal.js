@@ -94,6 +94,11 @@ export const process = (component, paymentArea, itemId, description) => {
             }));
             const cancelButton = modal.getRoot().find('#airtel-cancel');
             cancelButton.on('click', function() {
+                e.preventDefault();
+                modal.destroy();
+            });
+            const payButton = modal.getRoot().find('#airtel-pay');
+            payButton.on('click', function() {
                 modal.destroy();
             });
             Promise.all([
@@ -103,6 +108,10 @@ export const process = (component, paymentArea, itemId, description) => {
                 const cancelButton1 = modal.getRoot().find('#airtel-cancel');
                 cancelButton1.on('click', function() {
                     e.preventDefault();
+                    modal.destroy();
+                });
+                const payButton = modal.getRoot().find('#airtel-pay');
+                payButton.on('click', function() {
                     modal.destroy();
                 });
                 const transId = airtelPay.transactionid;

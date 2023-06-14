@@ -141,7 +141,7 @@ class airtel_helper {
         $location = 'merchant/v1/payments/';
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = [
-            'reference' => \core_text::substr($reference, 0, 25),
+            'reference' => \core_text::substr($reference, 0, 64),
             'subscriber' => [
                 'country' => \core_text::strtoupper($usercountry),
                 'currency' => $currency,
@@ -227,7 +227,7 @@ class airtel_helper {
                     ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]);
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
+            } catch (\Exception $e) {
                 $this->token = '';
                 return [];
             }
@@ -237,9 +237,11 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
-            // TODO: Bad gateway.
+            mtrace(json_encode($e));
             $result = $e->getMessage();
         } finally {
+            mtrace(json_encode($data));
+            mtrace(json_encode($result));
             $decoded = json_decode($result, true);
             // Trigger an event.
             $eventargs = ['context' => \context_system::instance(),
@@ -248,6 +250,29 @@ class airtel_helper {
             $event->trigger();
         }
         return $decoded;
+    }
+
+    /**
+     * Transaction code
+     * @param string $code
+     * @return string
+     */
+    public static function esb_code(string $code): string {
+        $returns = [
+            'ESB000001' => 'Something went wrong.',
+            'ESB000004' => 'An error occurred while initiating the payment.',
+            'ESB000008' => 'Field validation.',
+            'ESB000011' => 'Transaction failed.',
+            'ESB000010' => 'Your transaction has been successfully processed.',
+            'ESB000014' => 'An error occurred while fetching the transaction status.',
+            'ESB000033' => 'Invalid MSISDN Length. MSISDN Length should be ',
+            'ESB000034' => 'Invalid Country Name.',
+            'ESB000035' => 'Invalid Currency Code.',
+            'ESB000036' => 'Invalid MSISDN Length. MSISDN Length should be ? and should start with 0.',
+            'ESB000039' => 'Vendor is not configured to do transaction in the country.',
+            'ESB000041' => 'External transaction ID already exists.',
+            'ESB000045' => 'No transaction found with provided transaction Id.'];
+        return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
     /**
@@ -271,6 +296,7 @@ class airtel_helper {
      */
     public static function dp_code(string $code): string {
         $returns = [
+            'DP00800001000' => 'Transaction ambigous',
             'DP00800001001' => 'Valid pin',
             'DP00800001002' => 'Invalid pin',
             'DP00800001003' => 'Exceeds balance',

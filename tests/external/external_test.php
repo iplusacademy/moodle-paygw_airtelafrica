@@ -56,9 +56,10 @@ class external_test extends \advanced_testcase {
         $this->phone = getenv('phone') ? getenv('phone') : '666666666';
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
+        $accountid = $account->get('id');
         $course = $generator->create_course();
         $user = $generator->create_user(['country' => 'UG', 'phone2' => $this->phone]);
-        $data = ['courseid' => $course->id, 'customint1' => $account->get('id'), 'cost' => 66, 'currency' => 'UGX', 'roleid' => 5];
+        $data = ['courseid' => $course->id, 'customint1' => $accountid, 'cost' => 66666, 'currency' => 'UGX', 'roleid' => 5];
         $feeplugin = enrol_get_plugin('fee');
         $this->feeid = $feeplugin->add_instance($course, $data);
         $config = new \stdClass();
@@ -129,7 +130,7 @@ class external_test extends \advanced_testcase {
         $this->assertEquals($clientid, $result['clientid']);
         $this->assertEquals('maul', $result['brandname']);
         $this->assertEquals('UG', $result['country']);
-        $this->assertEquals(66, $result['cost']);
+        $this->assertEquals(66666, $result['cost']);
         $this->assertEquals('UGX', $currency);
         $this->assertEquals($this->phone, $result['phone']);
         $this->assertEquals('UG', $result['usercountry']);
@@ -168,7 +169,7 @@ class external_test extends \advanced_testcase {
             'relateduserid' => $user->id,
             'other' => [
                 'currentcy' => 'USD',
-                'amount' => 66,
+                'amount' => 66666,
                 'orderId' => 20,
                 'paymentId' => 333
             ]
@@ -191,17 +192,14 @@ class external_test extends \advanced_testcase {
         $this->setUser($user);
         $paygen = $generator->get_plugin_generator('core_payment');
         $account = $paygen->create_payment_account(['gateways' => 'airtelafrica']);
-        $data = ['courseid' => $course->id, 'customint1' => $account->get('id'), 'cost' => 66, 'currency' => 'EUR', 'roleid' => 5];
+        $accountid = $account->get('id');
+        $data = ['courseid' => $course->id, 'customint1' => $accountid, 'cost' => 66666, 'currency' => 'EUR', 'roleid' => 5];
         $this->feeid = $feeplugin->add_instance($course, $data);
 
-        $paymentid = $paygen->create_payment([
-            'accountid' => $account->get('id'),
-            'amount' => 10,
-            'userid' => $user->id
-        ]);
+        $paymentid = $paygen->create_payment(['accountid' => $accountid, 'amount' => 10, 'userid' => $user->id]);
         $payable = \enrol_fee\payment\service_provider::get_payable('fee', $this->feeid);
-        $this->assertEquals($account->get('id'), $payable->get_account_id());
-        $this->assertEquals(66, $payable->get_amount());
+        $this->assertEquals($accountid, $payable->get_account_id());
+        $this->assertEquals(66666, $payable->get_amount());
         $this->assertEquals('EUR', $payable->get_currency());
         $successurl = \enrol_fee\payment\service_provider::get_success_url('fee', $this->feeid);
         $this->assertEquals($CFG->wwwroot . '/course/view.php?id=' . $course->id, $successurl->out(false));

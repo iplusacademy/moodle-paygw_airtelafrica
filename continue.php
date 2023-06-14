@@ -93,8 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $suc = true;
                 $trans = $transaction['status'];
                 if ($transaction['status'] == 'TS') {
-                    $str = explode($transaction['message'], ' ');
-
                     $paymentid = \core_payment\helper::save_payment(
                         $payable->get_account_id(),
                         $data->component,
