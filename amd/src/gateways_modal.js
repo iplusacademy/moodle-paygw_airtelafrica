@@ -79,6 +79,7 @@ export const process = (component, paymentArea, itemId, description) => {
             modal.destroy();
         });
         const payButton = modal.getRoot().find('#airtel-pay');
+        payButton.removeAttr('disabled');
         payButton.on('click', function(e) {
             e.preventDefault();
             modal.setBody(Templates.render('paygw_airtelafrica/busy', {
@@ -134,7 +135,7 @@ export const process = (component, paymentArea, itemId, description) => {
                     const outDiv = modal.getRoot().find('#airtel-out');
                     outDiv.append('<h4>Transaction id: ' + transId + '</h4>');
                     var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                    var interval = 20000;
+                    var interval = airtelConfig.timeout;
                     const b = '</div>';
                     arrayints.forEach(function(el, index) {
                         setTimeout(function() {
@@ -175,7 +176,8 @@ export const process = (component, paymentArea, itemId, description) => {
                                             });
                                             spinnerDiv.attr('style', 'display: none;');
                                             cancelButton1.attr('style', 'display: none;');
-                                            return Promise.reject();
+                                            payButton.removeAttr('disabled');
+                                            return new Promise(() => null);
                                         }
                                     }
                                 }]);

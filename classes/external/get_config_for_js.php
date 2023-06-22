@@ -87,6 +87,7 @@ class get_config_for_js extends external_api {
             'currency' => $currency,
             'phone' => $user['phone'],
             'usercountry' => $user['country'],
+            'timeout' => $helper->testing ? 1000 : 20000,
             'reference' => implode(' ', [$itemid, $user['id'], $helper->sandbox])];
     }
 
@@ -104,6 +105,7 @@ class get_config_for_js extends external_api {
             'currency' => new external_value(PARAM_TEXT, 'Currency'),
             'phone' => new external_value(PARAM_TEXT, 'User mobile phone'),
             'usercountry' => new external_value(PARAM_TEXT, 'User country'),
+            'timeout' => new external_value(PARAM_INT, 'Timout'),
             'reference' => new external_value(PARAM_TEXT, 'Reference'),
         ]);
     }

@@ -83,12 +83,12 @@ class airtel_helper {
      * @param string $country Airtel Africa location.
      */
     public function __construct(array $config, string $country = 'UG') {
-        $this->sandbox = strtolower($config['environment']) == 'sandbox';
+        $this->sandbox = (bool)strtolower($config['environment']) == 'sandbox';
         $this->clientid = $config[$this->sandbox ? 'clientidsb' : 'clientid'];
         $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
         $this->airtelurl = $this::get_baseurl();
         $this->country = array_key_exists('country', $config) ? $config['country'] : $country;
-        $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
+        $this->testing = defined('PHPUNIT_TEST') || defined('BEHAT_SITE_RUNNING');
         if ($this->testing) {
             $this->sandbox = true;
         }
@@ -216,7 +216,8 @@ class airtel_helper {
      * @return array Decoded API response.
      */
     private function request_post(string $location, array $data, array $headers = [], string $verb = 'POST'): array {
-        $decoded = $result = '';
+        $decoded = [];
+        $result = '';
         $client = new \GuzzleHttp\Client();
         if ($this->token == '') {
             $authdata = ['client_id' => $this->clientid, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials'];
@@ -228,7 +229,7 @@ class airtel_helper {
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\Exception $e) {
-                $this->token = '';
+                mtrace('Token error: ' . json_encode($result));
                 return [];
             }
         }
@@ -237,18 +238,19 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
-            mtrace(json_encode($e));
+            mtrace('Request error: ' . json_encode($e));
             $result = $e->getMessage();
         } finally {
-            mtrace(json_encode($data));
-            mtrace(json_encode($result));
             $decoded = json_decode($result, true);
             // Trigger an event.
             $eventargs = ['context' => \context_system::instance(),
                 'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);
             $event->trigger();
+            // Uncomment folowing line to have more info.
+            mtrace($result);
         }
+
         return $decoded;
     }
 
@@ -291,6 +293,8 @@ class airtel_helper {
 
     /**
      * Return code
+     *
+     * Collection api DP008 specific codes.
      * @param string $code
      * @return string
      */
@@ -307,7 +311,8 @@ class airtel_helper {
             'DP00800001008' => 'Refused',
             'DP00800001009' => 'Do not honor',
             'DP00800001010' => 'Transaction not permitted',
-            'DP00800001024' => 'Transaction timed out'];
+            'DP00800001024' => 'Transaction timed out',
+            'DP00800001025' => 'Transaction not found'];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
@@ -343,7 +348,7 @@ class airtel_helper {
     }
 
     /**
-     * Phone helper.
+     * User data helper.
      *
      * @return array
      */

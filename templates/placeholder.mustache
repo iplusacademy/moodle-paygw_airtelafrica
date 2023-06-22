@@ -29,7 +29,7 @@
     Example context (json): {}
 }}
 <div id="airtel-image" class="bg-grey mb-4 w-100 text-center">
-    <img src="/payment/gateway/airtelafrica/pix/img.png" title="{{#str}} plugin, paygw_airtelafrica {{/str}}" alt="{{#str}} plugin, paygw_airtelafrica {{/str}}">
+    <img src="/payment/gateway/airtelafrica/pix/img.png" title="{{#str}} pluginname, paygw_airtelafrica {{/str}}" alt="{{#str}} pluginname, paygw_airtelafrica {{/str}}">
 </div>
 <div class="bg-grey mb-2 w-100 text-center">{{#str}} phone2, moodle {{/str}}</div>
 <div id="airtel-phone" class="mb-2 w-100 text-center"></div>
@@ -40,7 +40,7 @@
 <div class="mb-2 w-100 text-center font-italic">{{#str}} warning_phone, paygw_airtelafrica {{/str}}</div>
 <div class="text-center">
     <form id="airtel-form" action="/payment/gateway/airtelafrica/callback.php" method="post">
-        <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay">
+        <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay" disabled>
         <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="airtel-cancel" class="airtel-pay btn btn-secondary" data-for="enablepay">
     </form>
 </div>

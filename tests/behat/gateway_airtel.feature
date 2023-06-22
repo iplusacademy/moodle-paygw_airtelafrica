@@ -37,7 +37,7 @@ Feature: Airtel Africa payment gateway
       | Brand name        | Test brand                           |
       | Client ID         | 1335ee67-c7fe-4578-902a-f0b7cff0bf93 |
       | Secret            | 61e1b56f-1ccb-417e-bf04-56378e987157 |
-      | Client sandbox ID | 1335ee67-c7fe-4578-902a-f0b7cff0bf93 |
+      | Sandbox Client ID | 1335ee67-c7fe-4578-902a-f0b7cff0bf93 |
       | Sandbox secret    | 61e1b56f-1ccb-417e-bf04-56378e987157 |
       | Environment       | sandbox                              |
       | Country           | Uganda                               |
@@ -85,18 +85,19 @@ Feature: Airtel Africa payment gateway
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
     And I should see "5,000"
+    And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
+    And I wait until the page is ready
     And I should see "789012"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
-    # Cannot wait in GitHub actions.
-    # And I wait "1" seconds
+    And I wait until the page is ready
     And I click on "Cancel" "button" in the "Airtel Africa" "dialogue"
     Then I should see "This course requires a payment for entry."
 
   @javascript
   Scenario: Student should be logged in automatically after an Airtel Africa payment
-    When I log in as "student2"
+    When I log in as "student1"
     And I am on course index
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
@@ -104,15 +105,37 @@ Feature: Airtel Africa payment gateway
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
     And I should see "5,000"
+    And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should see "666666666"
+    And I should see "789012"
     And I should see "profile page"
-    Then I call airtel callback
-    Then I call airtel callback
-    Then I call airtel callback
+    And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    And I wait until the page is ready
+    And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    And I wait until the page is ready
+    And I should see "3 minutes"
     # Hacked by airtel callback
-    # And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    Then I call airtel callback
+    And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
+    Then I call airtel callback
+    And I wait until the page is ready
     And I should see "TestPage"
+
+  @javascript
+  Scenario: Student should not be able to complete Airtel Africa payment with wrong country
+    When I log in as "student2"
+    And I am on course index
+    And I follow "Course 2"
+    Then I should see "This course requires a payment for entry."
+    And I should see "5,000"
+    And I press "Select payment type"
+    And I should see "Airtel Africa" in the "Select payment type" "dialogue"
+    And I should see "5,000"
+    And I wait until the page is ready
+    And I click on "Proceed" "button" in the "Select payment type" "dialogue"
+    And I should not see "789012"
+    And I should see "profile page"
+    And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
 
   Scenario: Guest can see the login prompt on the Airtel Africa course enrolment page with round price
     When I log in as "guest"

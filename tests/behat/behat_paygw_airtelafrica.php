@@ -58,9 +58,8 @@ class behat_paygw_airtelafrica extends behat_base {
                 $DB->set_field('paygw_airtelafrica', 'moneyid', '666666666');
                 $payid = helper::save_payment($acc->id, 'enrol_fee', 'fee', $enr->id, $uid, 5000, 'UGX', 'paygw_airtelafrica');
                 helper::deliver_order('enrol_fee', 'fee', $enr->id, $payid, $uid);
-                $this->getSession()->wait(1000);
             } else {
-                $this->getSession()->wait(1000);
+                // Hack to reload.
                 $this->getSession()->getDriver()->reload();
             }
         } else {

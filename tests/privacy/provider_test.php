@@ -27,15 +27,15 @@ namespace paygw_airtelafrica\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use core_privacy\tests\provider_testcase;
-use core_privacy\tests\request\approved_contextlist;
 use paygw_airtelafrica\privacy\provider;
 use stdClass;
 
 /**
- * Privacy provider test for enrol_paypal.
+ * Privacy provider test for payment gateway airtelafrica.
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
