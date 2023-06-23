@@ -108,6 +108,7 @@ class airtel_helper_test extends \advanced_testcase {
             $this->markTestSkipped('No login credentials');
         }
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
+        $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
         $helper = new airtel_helper($this->config);
         $result = $helper->request_payment(666666666, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
