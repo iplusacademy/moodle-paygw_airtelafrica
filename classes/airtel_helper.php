@@ -25,6 +25,7 @@
 
 namespace paygw_airtelafrica;
 
+use core_payment\helper;
 use curl;
 
 defined('MOODLE_INTERNAL') || die();
@@ -252,6 +253,58 @@ class airtel_helper {
         }
 
         return $decoded;
+    }
+
+    /**
+     * Enrol the user
+     *
+     * @param string $transactionid
+     * @param int $itemid
+     * @param string $component Name of the component that the itemid belongs to
+     * @param string $area The payment area
+     * @return string
+     */
+    public function enrol_user(string $transactionid, int $itemid, string $component, string $area): string {
+        global $DB;
+        // We assume the transaction failed.
+        $trans = 'TF';
+        $cond = ['transactionid' => $transactionid, 'paymentid' => $itemid];
+        if ($rec = $DB->get_record('paygw_airtelafrica', $cond)) {
+            if ($rec->timecompleted == 0) {
+                $this->token = $rec->moneyid;
+                $payable = helper::get_payable($component, $area, $itemid);
+                $currency = $payable->get_currency();
+                $result = $this->transaction_enquiry($transactionid, $currency);
+                $status = self::array_helper('status', $result);
+                $data = self::array_helper('data', $result);
+                if ($status && $data && $status['code'] == '200') {
+                    $transaction = self::array_helper('transaction', $data);
+                    if ($transaction) {
+                        $trans = $transaction['status'];
+                        if ($trans == 'TS') {
+                            // We have a succesfull transaction.
+                            $moneyid = self::array_helper('airtel_money_id', $transaction);
+                            $surcharge = helper::get_gateway_surcharge('airtelafrica');
+                            $amount = helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+                            $payid = $payable->get_account_id();
+                            $saved = helper::save_payment(
+                                $payid,
+                                $component,
+                                $area,
+                                $itemid,
+                                $rec->userid,
+                                $amount,
+                                $currency,
+                                'airtelafrica');
+                            helper::deliver_order($component, $area, $itemid, $saved, $rec->userid);
+                            $DB->set_field('paygw_airtelafrica', 'timecompleted', time(), $cond);
+                            $DB->set_field('paygw_airtelafrica', 'moneyid', $moneyid, $cond);
+                        }
+                    }
+                }
+            }
+        }
+        return $trans;
     }
 
     /**

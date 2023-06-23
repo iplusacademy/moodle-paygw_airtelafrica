@@ -35,17 +35,13 @@ namespace paygw_airtelafrica;
  */
 class callback_test extends \advanced_testcase {
 
-    /** @var \core_payment\account account */
-    private $account;
-
     /**
      * Setup function.
      */
     protected function setUp(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
         $this->resetAfterTest(true);
-        set_config('country', 'UG');
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
-        $this->account = $generator->create_payment_account(['gateways' => 'airtelafrica']);
     }
 
     /**
@@ -53,12 +49,10 @@ class callback_test extends \advanced_testcase {
      * @coversNothing
      */
     public function test_callback() {
-        global $CFG;
-        require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
         $client = new \GuzzleHttp\Client();
         $authdata = ['client_id' => 'fakeclientid', 'client_secret' => 'fakesecret', 'grant_type' => 'client_credentials'];
         $headers = ['Content-Type' => 'application/json'];
-        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/callback.php';
+        $url = $this->get_local_url('callback');
         $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $authdata]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
@@ -69,33 +63,40 @@ class callback_test extends \advanced_testcase {
      * @coversNothing
      */
     public function test_continue() {
-        global $CFG, $DB;
-        require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
-        $generator = $this->getDataGenerator();
-        $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
-        $course = $generator->create_course();
-        $user = $generator->create_user(['country' => 'UG', 'phone2' => '666666666']);
-        $accountid = $account->get('id');
-        $data = ['courseid' => $course->id, 'customint1' => $accountid, 'cost' => 6666, 'currency' => 'UGX', 'roleid' => 5];
-        $feeplugin = enrol_get_plugin('fee');
-        $feeid = $feeplugin->add_instance($course, $data);
-        $config = new \stdClass();
-        $config->clientid = getenv('login') ? getenv('login') : 'fakelogin';
-        $config->clientidsb = getenv('login') ? getenv('login') : 'fakelogin';
-        $config->brandname = 'maul';
-        $config->environment = 'sandbox';
-        $config->secret = getenv('secret') ? getenv('secret') : 'fakesecret';
-        $config->secretsb = getenv('secret') ? getenv('secret') : 'fakesecret';
-        $config->country = 'UG';
-        $DB->set_field('payment_gateways', 'config', json_encode($config), []);
-        $this->setUser($user);
-
         $client = new \GuzzleHttp\Client();
-        $data = ['itemid' => $feeid, 'reference' => 'course33333'];
-        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/continue.php';
+        $data = ['sesskey' => sesskey(),
+            'component' => 'enrol_fee',
+            'paymentarea' => 'fee',
+            'itemid' => 82,
+            'transactionid' => '4871171159',
+            'reference' => 'course33333'];
+        $url = $this->get_local_url('continue');
         $response = $client->request('POST', $url, ['form_params' => $data]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
+    }
+
+    /**
+     * Get local url.
+     * @param string $phpfile
+     * @return string
+     */
+    private function get_local_url(string $phpfile) {
+        global $CFG;
+        $url = new \moodle_url("/payment/gateway/airtelafrica/$phpfile.php");
+        $url = $url->raw_out();
+        $url = str_ireplace(['https://', 'http://'], '', $url);
+        $dom = 'test.ewallah.net';
+        $lines = file($CFG->dirroot . '/config.php');
+        foreach ($lines as $line) {
+            if (strpos($line, '$CFG->wwwroot') !== false) {
+                $dom = str_ireplace('$CFG->wwwroot', '', $line);
+                $dom = str_ireplace(["'", '"', "=", ";", " "], '', $dom);
+                $dom = str_ireplace(["\r\n", "\r", "\n", "\\r", "\\n", "\\r\\n"], '', $dom);
+                break;
+            }
+        }
+        return str_ireplace('www.example.com/moodle', $dom, $url);
     }
 }
 

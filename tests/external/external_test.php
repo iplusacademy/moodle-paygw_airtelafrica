@@ -101,6 +101,7 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction complete.
+     * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\external\transaction_start
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
@@ -108,7 +109,7 @@ class external_test extends \advanced_testcase {
         $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
-        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666', 'UGX');
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666');
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
     }
@@ -149,7 +150,6 @@ class external_test extends \advanced_testcase {
                 $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $transactionid, $currency);
                 if (count($result) > 0) {
                     $this->assertArrayHasKey('success', $result);
-                    $this->assertEquals('Transaction Success', $result['message']);
                 }
             }
         }

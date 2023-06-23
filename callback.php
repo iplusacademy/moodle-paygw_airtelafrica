@@ -23,9 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('NO_DEBUG_DISPLAY', true);
+
 // @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../config.php');
-global $CFG, $DB, $USER;
+
+global $CFG, $DB;
 require_once($CFG->dirroot . '/course/lib.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -51,19 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $helper = new \paygw_airtelafrica\airtel_helper($conf);
                 $payable = \core_payment\helper::get_payable('enrol_fee', 'fee', $payrec->paymentid);
                 $currency = $payable->get_currency();
-                $result = [
-                    'data' => [
-                        'transaction' => [
-                               'airtel_money_id' => 'C3648.00993.538XX.XX67',
-                               'id' => '666666666',
-                               'message' => 'success',
-                               'status' => 'TS']],
-                    'status' => [
-                        'code' => '200',
-                        'message' => 'SUCCESS',
-                        'result_code' => 'ESB000010',
-                        'response_code' => 'DP00800001006',
-                        'success' => true]];
                 $result = $helper->transaction_enquiry($transactionid, $currency);
                 $status = \paygw_airtelafrica\airtel_helper::array_helper('status', $result);
                 $data = \paygw_airtelafrica\airtel_helper::array_helper('data', $result);

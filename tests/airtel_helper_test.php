@@ -99,6 +99,25 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(true, $result['status']['success']);
     }
 
+    /**
+     * Test enrol Airtel Africa payment
+     * @covers \paygw_airtelafrica\airtel_helper
+     */
+    public function test_enrol_manualy() {
+        if ($this->config['clientidsb'] == '') {
+            $this->markTestSkipped('No login credentials');
+        }
+        $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
+        $random = random_int(1000000000, 9999999999);
+        $helper = new airtel_helper($this->config);
+        $result = $helper->request_payment(666666666, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
+        if (count($result) > 0) {
+            $this->assertEquals(200, $result['status']['code']);
+            $this->assertEquals(1, $result['status']['success']);
+            $transactionid = $result['data']['transaction']['id'];
+            $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
+        }
+    }
 
     /**
      * Test manual Airtel Africa payment

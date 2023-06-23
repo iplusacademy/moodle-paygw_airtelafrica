@@ -116,7 +116,6 @@ export const process = (component, paymentArea, itemId, description) => {
                     modal.destroy();
                 });
                 const transId = airtelPay.transactionid;
-                const currency = airtelConfig.currency;
                 modal.setBody(Templates.render('paygw_airtelafrica/busy', {
                     "sesskey": Config.sesskey,
                     "phone": airtelConfig.phone,
@@ -150,7 +149,6 @@ export const process = (component, paymentArea, itemId, description) => {
                                         paymentArea,
                                         itemId,
                                         transId,
-                                        currency,
                                     },
                                     done: function(airtelPing) {
                                         var tmp = transId + ' ' + airtelPing.success;
