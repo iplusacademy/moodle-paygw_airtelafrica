@@ -89,8 +89,8 @@ class transaction_start extends external_api {
         $reference = $component . '_' . $itemid . '_' . $userid;
         $random = random_int(1000000000, 9999999999);
         $result = $helper->request_payment($random, $reference, $cost, $currency, $user['phone'], $user['country']);
-        $status = array_key_exists('status', $result) ? $result['status'] : false;
-        $data = array_key_exists('data', $result) ? $result['data'] : false;
+        $status = airtel_helper::array_helper('status', $result);
+        $data = airtel_helper::array_helper('data', $result);
         $esb = $status ? $status['result_code'] : 'ESB000001';
         if ($status && $status['code'] == '200' && $esb == 'ESB000010') {
             $cond = ['paymentid' => $itemid, 'userid' => $userid];

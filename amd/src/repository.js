@@ -30,7 +30,7 @@ import Ajax from 'core/ajax';
  * @param {string} paymentArea The area of the component that the itemId belongs to
  * @param {number} itemId An internal identifier that is used by the component
  * @returns {Promise<{clientid: string, brandname: string, country: string, cost: number, currency: string, phone: string,
- *                    usercountry: string, userid: number, reference: string }>}
+ *                    usercountry: string, timeout: number, reference: string }>}
  */
 export const getConfigForJs = (component, paymentArea, itemId) => {
     const request = {
@@ -73,10 +73,9 @@ export const transactionStart = (component, paymentArea, itemId) => {
  * @param {string} paymentArea The area of the component that the itemId belongs to
  * @param {number} itemId An internal identifier that is used by the component
  * @param {string} transactionId The order id coming back from Airtel Africa
- * @param {string} currency The currency used
  * @returns {Promise<{success: string, message: string}>}
  */
-export const transactionComplete = (component, paymentArea, itemId, transactionId, currency) => {
+export const transactionComplete = (component, paymentArea, itemId, transactionId) => {
     const request = {
         methodname: 'paygw_airtelafrica_transaction_complete',
         args: {
@@ -84,7 +83,6 @@ export const transactionComplete = (component, paymentArea, itemId, transactionI
             paymentarea: paymentArea,
             itemid: itemId,
             transactionid: transactionId,
-            currency,
         },
     };
 

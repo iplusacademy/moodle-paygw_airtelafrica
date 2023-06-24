@@ -28,12 +28,11 @@ declare(strict_types=1);
 namespace paygw_airtelafrica\external;
 
 use core_payment\helper;
-use paygw_airtelafrica\airtel_helper;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-
+use paygw_airtelafrica\airtel_helper;
 /**
  * This class completes a payment with the Airtel Africa payment gateway.
  *

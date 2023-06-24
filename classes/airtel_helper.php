@@ -111,7 +111,7 @@ class airtel_helper {
      * @return bool
      */
     private function is_testing(string $id): bool {
-        return (bool)($this->testing && $id == '666666666');
+        return $this->testing && $id == '666666666';
     }
 
     /**
