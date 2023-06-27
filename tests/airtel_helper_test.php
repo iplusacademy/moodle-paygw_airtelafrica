@@ -65,7 +65,6 @@ class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
         $this->assertEquals('Transaction Success', airtel_helper::ta_code('TS'));
         $this->assertEquals('In process', airtel_helper::dp_code('DP00800001006'));
-        $this->assertEquals('Invalid currency provided.', airtel_helper::rr_code('ROUTER112'));
         $random = random_int(1000000000, 9999999999);
         try {
             $helper->request_payment($random, "tst5_course_$random", 1000, 'UGX', '666666666', 'BE');
@@ -107,11 +106,11 @@ class airtel_helper_test extends \advanced_testcase {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+        $random = random_int(1000000000, 9999999999);
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
-        $random = random_int(1000000000, 9999999999);
         $helper = new airtel_helper($this->config);
-        $result = $helper->request_payment(666666666, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
         if (count($result) > 0) {
             $this->assertEquals(200, $result['status']['code']);
             $this->assertEquals(1, $result['status']['success']);

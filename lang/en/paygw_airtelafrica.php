@@ -64,6 +64,7 @@ $string['secret'] = 'Secret';
 $string['secret_help'] = 'The secret that Airtel Africa generated for your application.';
 $string['secretsb'] = 'Sandbox secret';
 $string['secretsb_help'] = 'The Sandbox secret that Airtel Africa generated for your application.';
+$string['unable'] = 'Unable to communicate with Airtel Africa';
 $string['validcontinue'] = 'Please wait until we receive confirmation by Aitel, +-30 seconds before you continue.';
 $string['validtransaction'] = 'We got a valid transactionid: {$a}';
 $string['warning_phone'] = 'Please be sure that this is <strong>your</strong> Mobile phone number and country. You can change the number and country on your <a href="/user/edit.php" title="profile">profile page</a>.</br>

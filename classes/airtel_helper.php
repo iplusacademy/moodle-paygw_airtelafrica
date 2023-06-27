@@ -45,7 +45,7 @@ class airtel_helper {
     /**
      * @var string The base API URL
      */
-    public $airtelurl;
+    private $airtelurl;
 
     /**
      * @var string Client ID
@@ -55,17 +55,17 @@ class airtel_helper {
     /**
      * @var string Airtel Africa App secret
      */
-    public $secret;
+    private $secret;
 
     /**
      * @var string The country where Airtel Africa client is located
      */
-    public $country;
+    private $country;
 
     /**
      * @var bool Sandbox
      */
-    public $sandbox;
+    private $sandbox;
 
     /**
      * @var string The oath bearer token
@@ -89,7 +89,7 @@ class airtel_helper {
         $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
         $this->airtelurl = $this::get_baseurl();
         $this->country = array_key_exists('country', $config) ? $config['country'] : $country;
-        $this->testing = defined('PHPUNIT_TEST') || defined('BEHAT_SITE_RUNNING');
+        $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
         if ($this->testing) {
             $this->sandbox = true;
         }
@@ -107,11 +107,13 @@ class airtel_helper {
     /**
      * Are we testing?
      *
+     * We assume there is no user with telephone number 666666666
+     *
      * @param string $id
      * @return bool
      */
     private function is_testing(string $id): bool {
-        return $this->testing && $id == '666666666';
+        return defined('BEHAT_SITE_RUNNING') ? $id == '666666666' : $this->testing && $id == '666666666';
     }
 
     /**
@@ -239,7 +241,6 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
-            mtrace('Request error: ' . json_encode($e));
             $result = $e->getMessage();
         } finally {
             $decoded = json_decode($result, true);
@@ -248,8 +249,8 @@ class airtel_helper {
                 'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);
             $event->trigger();
-            // Uncomment folowing line to have more info.
-            mtrace($result);
+            // Uncomment folowing line to have the data returned by MTN.
+            // mtrace($result);.
         }
 
         return $decoded;
@@ -366,26 +367,6 @@ class airtel_helper {
             'DP00800001010' => 'Transaction not permitted',
             'DP00800001024' => 'Transaction timed out',
             'DP00800001025' => 'Transaction not found'];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
-    }
-
-    /**
-     * Router code
-     * @param string $code
-     * @return string
-     */
-    public static function rr_code(string $code): string {
-        $returns = [
-            'ROUTER001' => 'The wallet is not configured.',
-            'ROUTER003' => 'Mandatory parameters are missing either in the header or body.',
-            'ROUTER005' => 'Country route is not configured.',
-            'ROUTER006' => 'Invalid country code provided.',
-            'ROUTER007' => 'Not authorized to perform any operations in the provided country.',
-            'ROUTER112' => 'Invalid currency provided.',
-            'ROUTER114' => 'An error occurred while validating the pin.',
-            'ROUTER115' => 'Pin you have entered is incorrect.',
-            'ROUTER116' => 'The encrypted value of the pin is incorrect. Kindly re-check the encryption mechanism.',
-            'ROUTER117' => 'An error occurred while generating the response.'];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 

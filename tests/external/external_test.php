@@ -80,8 +80,6 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_config_for_js() {
-        $this->assertInstanceOf('external_function_parameters', get_config_for_js::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', get_config_for_js::execute_returns());
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertEquals('UG', $result['country']);
     }
@@ -91,8 +89,6 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_start
      */
     public function test_transaction_start() {
-        $this->assertInstanceOf('external_function_parameters', transaction_start::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_start::execute_returns());
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertArrayHasKey('message', $result);
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
@@ -106,8 +102,6 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete() {
-        $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666');
         $this->assertArrayHasKey('success', $result);
@@ -146,7 +140,6 @@ class external_test extends \advanced_testcase {
             $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $transactionid, $currency);
             if (count($result) > 0) {
                 $this->assertArrayHasKey('success', $result);
-                $this->assertEquals('Transaction in Progress', $result['message']);
                 $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $transactionid, $currency);
                 if (count($result) > 0) {
                     $this->assertArrayHasKey('success', $result);

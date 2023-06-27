@@ -52,7 +52,7 @@ class callback_test extends \advanced_testcase {
         $client = new \GuzzleHttp\Client();
         $authdata = ['client_id' => 'fakeclientid', 'client_secret' => 'fakesecret', 'grant_type' => 'client_credentials'];
         $headers = ['Content-Type' => 'application/json'];
-        $url = $this->get_local_url('callback');
+        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/callback.php';
         $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $authdata]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
@@ -70,34 +70,9 @@ class callback_test extends \advanced_testcase {
             'itemid' => 82,
             'transactionid' => '4871171159',
             'reference' => 'course33333'];
-        $url = $this->get_local_url('continue');
+        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/continue.php';
         $response = $client->request('POST', $url, ['form_params' => $data]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
     }
-
-    /**
-     * Get local url.
-     * @param string $phpfile
-     * @return string
-     */
-    private function get_local_url(string $phpfile) {
-        global $CFG;
-        $url = new \moodle_url("/payment/gateway/airtelafrica/$phpfile.php");
-        $url = $url->raw_out();
-        $url = str_ireplace(['https://', 'http://'], '', $url);
-        $dom = 'test.ewallah.net';
-        $lines = file($CFG->dirroot . '/config.php');
-        foreach ($lines as $line) {
-            if (strpos($line, '$CFG->wwwroot') !== false) {
-                $dom = str_ireplace('$CFG->wwwroot', '', $line);
-                $dom = str_ireplace(["'", '"', "=", ";", " "], '', $dom);
-                $dom = str_ireplace(["\r\n", "\r", "\n", "\\r", "\\n", "\\r\\n"], '', $dom);
-                break;
-            }
-        }
-        return str_ireplace('www.example.com/moodle', $dom, $url);
-    }
 }
-
-
