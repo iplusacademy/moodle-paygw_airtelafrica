@@ -44,15 +44,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $payrec = $DB->get_record($table, $cond);
                 $msg = \paygw_airtelafrica\airtel_helper::array_helper('message', $transaction) ?? 'Unknown';
                 $mid = \paygw_airtelafrica\airtel_helper::array_helper('airtel_money_id', $transaction) ?? '';
-                $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => 'fee', 'id' => $payrec->paymentid]);
+                $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $payrec->paymentarea, 'id' => $payrec->paymentid]);
                 $eventargs = [
                     'context' => \context_course::instance($courseid),
                     'userid' => $payrec->userid,
                     'other' => ['message' => $msg, 'id' => $tid, 'airtel_money_id' => $mid]];
                 \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
-                $conf = \core_payment\helper::get_gateway_configuration('enrol_fee', 'fee', $payrec->paymentid, $gateway);
+                $conf = \core_payment\helper::get_gateway_configuration(
+                    $payrec->component,
+                    $payrec->paymentarea,
+                    $payrec->paymentid,
+                    $gateway);
                 $helper = new \paygw_airtelafrica\airtel_helper($conf);
-                $payable = \core_payment\helper::get_payable('enrol_fee', 'fee', $payrec->paymentid);
+                $payable = \core_payment\helper::get_payable($payrec->component, $payrec->paymentarea, $payrec->paymentid);
                 $currency = $payable->get_currency();
                 $result = $helper->transaction_enquiry($transactionid, $currency);
                 $status = \paygw_airtelafrica\airtel_helper::array_helper('status', $result);
@@ -67,14 +71,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         try {
                             $paymentid = \core_payment\helper::save_payment(
                                 $payable->get_account_id(),
-                                'enrol_fee',
-                                'fee',
+                                $payrec->component,
+                                $payrec->paymentarea,
                                 $transactionid,
                                 $payrec->userid,
                                 $amount,
                                 $currency,
                                 $gateway);
-                            \core_payment\helper::deliver_order('enrol_fee', 'fee', $transactionid, $paymentid, $payrec->userid);
+                            \core_payment\helper::deliver_order(
+                                $payrec->component,
+                                $payrec->paymentarea,
+                                $transactionid,
+                                $paymentid,
+                                $payrec->userid);
                         } catch (Exception $e) {
                             die($e->getMessage());
                         }

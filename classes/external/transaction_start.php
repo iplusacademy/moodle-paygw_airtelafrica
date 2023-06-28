@@ -104,6 +104,8 @@ class transaction_start extends external_api {
             $data->transactionid = $transactionid;
             $data->moneyid = $helper->token;
             $data->timecreated = time();
+            $data->component = $component;
+            $data->paymentarea = $paymentarea;
             $DB->insert_record('paygw_airtelafrica', $data);
         }
         return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => airtel_helper::esb_code($esb)];

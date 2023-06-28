@@ -57,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $data->$key = fix_utf8($value);
     }
     $url = new \moodle_url('/');
-    if (property_exists($data, 'itemid') &&
-        $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => 'fee', 'id' => $data->itemid])) {
+    if (property_exists($data, 'itemid') && property_exists($data, 'paymentarea') &&
+        $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $data->paymentarea, 'id' => $data->itemid])) {
         $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
     }
     redirect($url);
