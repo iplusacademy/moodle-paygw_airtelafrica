@@ -42,9 +42,6 @@ class airtel_helper_test extends \advanced_testcase {
     /** @var string phone */
     private $phone;
 
-    /** @var string base */
-    protected $base = 'https://api.mtn.com/';
-
     /**
      * Setup function- we will create a course and add an assign instance to it.
      */
@@ -196,36 +193,6 @@ class airtel_helper_test extends \advanced_testcase {
         } catch (\moodle_exception $e) {
             $this->assertEquals('Exception - Invalid country code provided.', $e->getmessage());
         }
-    }
-
-    /**
-     * Test callback
-     * @covers \paygw_airtelafrica\airtel_helper
-     */
-    public function test_callback() {
-        // TODO: we should use an external server to test out the callback.
-        $location = 'https://test.ewallah.net/payment/gateway/airtelafrica/callback.php';
-        $data = ['transaction' => [
-           'id' => 'BBZMiscxy',
-           'message' => 'Paid UGX 5,000 to MAUL, Charge UGX 140, Trans ID MP210603.1234.L06941.',
-           'status_code' => 'TS',
-           'airtel_money_id' => 'MP210603.1234.L06941']];
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_PROXY, $location);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_VERBOSE, false);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($curl, CURLOPT_URL, $location);
-        $result = curl_exec($curl);
-        $this->assertStringNotContainsString('MAUL', $result);
-        @curl_close($curl);
     }
 
     /**

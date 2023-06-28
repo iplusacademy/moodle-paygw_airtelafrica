@@ -57,22 +57,4 @@ class callback_test extends \advanced_testcase {
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
     }
-
-    /**
-     * Test continue.
-     * @coversNothing
-     */
-    public function test_continue() {
-        $client = new \GuzzleHttp\Client();
-        $data = ['sesskey' => sesskey(),
-            'component' => 'enrol_fee',
-            'paymentarea' => 'fee',
-            'itemid' => 82,
-            'transactionid' => '4871171159',
-            'reference' => 'course33333'];
-        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/continue.php';
-        $response = $client->request('POST', $url, ['form_params' => $data]);
-        $result = json_decode($response->getBody()->getContents(), true);
-        $this->assertEmpty($result);
-    }
 }

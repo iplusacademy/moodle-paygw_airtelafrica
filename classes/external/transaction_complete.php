@@ -51,7 +51,7 @@ class transaction_complete extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters([
             'component' => new external_value(PARAM_COMPONENT, 'The component name'),
-            'area' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
             'transactionid' => new external_value(PARAM_TEXT, 'The transaction id coming back from Airtel Africa')
         ]);
@@ -62,21 +62,21 @@ class transaction_complete extends external_api {
      * This function does not take cost as a parameter as we cannot rely on any provided value.
      *
      * @param string $component Name of the component that the itemid belongs to
-     * @param string $area The payment area
+     * @param string $paymentarea The payment area
      * @param int $itemid An internal identifier that is used by the component
      * @param string $transactionid Airtel Africa order ID
      * @return array
      */
-    public static function execute(string $component, string $area, int $itemid, string $transactionid): array {
+    public static function execute(string $component, string $paymentarea, int $itemid, string $transactionid): array {
         self::validate_parameters(self::execute_parameters(), [
             'component' => $component,
-            'area' => $area,
+            'paymentarea' => $paymentarea,
             'itemid' => $itemid,
             'transactionid' => $transactionid,
         ]);
-        $config = helper::get_gateway_configuration($component, $area, $itemid, 'airtelafrica');
+        $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, 'airtelafrica');
         $helper = new airtel_helper($config);
-        $trans = $helper->enrol_user($transactionid, $itemid, $component, $area);
+        $trans = $helper->enrol_user($transactionid, $itemid, $component, $paymentarea);
         return ['success' => ($trans == 'TS'), 'message' => airtel_helper::ta_code($trans)];
     }
 

@@ -35,11 +35,9 @@
             <directory suffix="_test.php">.</directory>
             <directory suffix=".php">db</directory>
             <directory suffix=".php">lang</directory>
-            <directory suffix=".php">tests/behat</directory>
             <file>version.php</file>
             <file>settings.php</file>
             <file>callback.php</file>
-            <file>continue.php</file>
             <file>tests/coverage.php</file>
         </exclude>
     </coverage>

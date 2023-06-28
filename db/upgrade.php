@@ -35,11 +35,11 @@ function xmldb_paygw_airtelafrica_upgrade($oldversion) {
     $dbman = $DB->get_manager();
     if ($oldversion < 2023062800) {
         $table = new xmldb_table('paygw_airtelafrica');
-        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '50', null, false, false, null, 'moneyid');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'enrol_fee', 'moneyid');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        $field = new xmldb_field('paymentarea', XMLDB_TYPE_CHAR, '50', null, false, false, null, 'component');
+        $field = new xmldb_field('paymentarea', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'fee', 'component');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

@@ -26,6 +26,7 @@
 namespace paygw_airtelafrica;
 
 use core_payment\helper;
+use core_text;
 use curl;
 
 defined('MOODLE_INTERNAL') || die();
@@ -144,9 +145,9 @@ class airtel_helper {
         $location = 'merchant/v1/payments/';
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = [
-            'reference' => \core_text::substr($reference, 0, 64),
+            'reference' => substr($reference, 0, 64),
             'subscriber' => [
-                'country' => \core_text::strtoupper($usercountry),
+                'country' => strtoupper($usercountry),
                 'currency' => $currency,
                 'msisdn' => $userphone],
             'transaction' => [
@@ -232,7 +233,7 @@ class airtel_helper {
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\Exception $e) {
-                mtrace('Token error: ' . json_encode($result));
+                mtrace_exception($e);
                 return [];
             }
         }
@@ -241,6 +242,7 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
+            mtrace_exception($e);
             $result = $e->getMessage();
         } finally {
             $decoded = json_decode($result, true);
@@ -249,7 +251,7 @@ class airtel_helper {
                 'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);
             $event->trigger();
-            // Uncomment folowing line to have the data returned by MTN.
+            // Uncomment folowing line to have the data returned by Airtel.
             // mtrace($result);.
         }
 
@@ -282,6 +284,7 @@ class airtel_helper {
                     $transaction = self::array_helper('transaction', $data);
                     if ($transaction) {
                         $trans = $transaction['status'];
+                        // If the payment was successul.
                         if ($trans == 'TS') {
                             // We have a succesfull transaction.
                             $moneyid = self::array_helper('airtel_money_id', $transaction);
