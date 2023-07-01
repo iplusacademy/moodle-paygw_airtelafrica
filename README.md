@@ -75,6 +75,19 @@ This plugin is developed and tested using
 * MariaDB
 * PostgreSQL
 
+## Testing
+
+This plugin can be tested in PHPUnit and Behat, but you need to add your phone - login - secret key as an environment variable.
+
+* env phone=???? login=???? secret=???? vendor/bin/phpunit --coverage-text payment/gateway/airtelafrica/
+* env phone=???? login=???? secret=???? vendor/bin/behat --tags='paygw_airtelafrica'
+
+Or you can use secrets in Github actions:
+
+* gh secret set phone -b"?????"
+* gh secret set login -b"?????"
+* gh secret set secret -b"?????"
+
 ## Plugin repositories
 
 This plugin will be published and regularly updated on [Github](https://github.com/iplusacademy/moodle-paygw_airtelafrica)
