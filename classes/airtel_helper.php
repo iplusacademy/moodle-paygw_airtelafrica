@@ -254,8 +254,7 @@ class airtel_helper {
             // Uncomment folowing line to have the data returned by Airtel.
             // mtrace($result);.
         }
-
-        return $decoded;
+        return $decoded ?? [];
     }
 
     /**
