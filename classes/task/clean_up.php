@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Clean up task for the airtel payment gateway plugin.
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\task;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION, 'local_aws' => ANY_VERSION];
-$plugin->supported = [401, 401];
-$plugin->release = 'v4.1.2';
-$plugin->version = 2023071700;
+/**
+ * Payment airtel clean up task.
+ *
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class clean_up extends \core\task\scheduled_task {
+
+    /**
+     * Name for this task.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('cleanuptask', 'paygw_airtelafrica');
+    }
+
+    /**
+     * Run task for cleaning up payments.
+     */
+    public function execute() {
+        global $DB;
+        $DB->delete_records_select('paygw_airtelafrica', 'timecompleted = :cond', ['cond' => null]);
+    }
+}
+

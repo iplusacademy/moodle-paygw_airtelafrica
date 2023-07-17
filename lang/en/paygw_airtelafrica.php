@@ -35,6 +35,7 @@ $string['cannotfetchorderdatails'] = 'Could not fetch payment details from Airte
 $string['checkairtelafrica'] = 'Airtel Africa';
 $string['check_warning'] = 'HTTP Port should be open for sandbox testing';
 $string['check_details'] = 'Airtel Africa needs port 80 for the sandbox';
+$string['cleanuptask'] = 'Clean up unfinished Airtel payments task';
 $string['clientid'] = 'Client ID';
 $string['clientid_help'] = 'The client ID that Airtel Africa generated for your application.';
 $string['clientidsb'] = 'Sandbox Client ID';
