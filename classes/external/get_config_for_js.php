@@ -87,7 +87,7 @@ class get_config_for_js extends external_api {
             'currency' => $currency,
             'phone' => $user['phone'],
             'usercountry' => $user['country'],
-            'timeout' => $helper->testing ? 1000 : 20000,
+            'timeout' => $helper->testing ? 5000 : 20000,
             'reference' => implode(' ', [$component, $paymentarea, $itemid, $user['id']])];
     }
 

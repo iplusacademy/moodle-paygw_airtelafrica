@@ -136,16 +136,32 @@ jobs:
 
       - name: firefox
         if: ${{ always() }}
+        env:
+            phone: ${{ secrets.phone }}
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
         run: moodle-plugin-ci --ansi behat
       
       - name: chrome
         if: ${{ always() }}
+        env:
+            phone: ${{ secrets.phone }}
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
         run: moodle-plugin-ci --ansi behat --profile chrome
 
       - name: firefox classic
         if: ${{ always() }}
+        env:
+            phone: ${{ secrets.phone }}
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
         run: moodle-plugin-ci --ansi behat --suite classic
       
       - name: chrome classic
         if: ${{ always() }}
+        env:
+            phone: ${{ secrets.phone }}
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
         run: moodle-plugin-ci --ansi behat --suite classic --profile=chrome
