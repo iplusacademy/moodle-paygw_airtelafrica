@@ -45,8 +45,7 @@ jobs:
         if: ${{ matrix.moodle-branch == 'MOODLE_401_STABLE' }}
         uses: actions/checkout@v3
         with:
-          repository: ewallah/moodle-local_aws.git
-          ref: 'main'
+          repository: catalyst/moodle-local_aws
           path: extras/local_aws
 
       - name: setup PHP
@@ -55,7 +54,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mbstring, pgsql, mysqli, gd, xmlrpc, zip
           ini-values: max_input_vars=5000
-          coverage: xdebug
+          coverage: pcov
 
       - name: composer
         run: |
@@ -79,44 +78,44 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: phplint
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi phplint
 
       - name: phpcpd
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi phpcpd
 
       - name: phpmd
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi phpmd
 
       - name: phpdoc
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi phpdoc
 
       - name: codechecker
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi codechecker --max-warnings 0
 
       - name: validate
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi validate
 
       - name: savepoints
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi savepoints
 
       - name: grunt
         continue-on-error: true
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi grunt
 
       - name: mustache
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci --ansi mustache
 
       - name: phpunit
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         env:
             phone: ${{ secrets.phone }}
             login: ${{ secrets.login }}
@@ -124,18 +123,18 @@ jobs:
         run: moodle-plugin-ci --ansi phpunit --coverage-text --coverage-clover
 
       - name: coveralls
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci coveralls-upload
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: privacy
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
       - name: firefox
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         env:
             phone: ${{ secrets.phone }}
             login: ${{ secrets.login }}
@@ -143,7 +142,7 @@ jobs:
         run: moodle-plugin-ci --ansi behat
       
       - name: chrome
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         env:
             phone: ${{ secrets.phone }}
             login: ${{ secrets.login }}
@@ -151,7 +150,7 @@ jobs:
         run: moodle-plugin-ci --ansi behat --profile chrome
 
       - name: firefox classic
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         env:
             phone: ${{ secrets.phone }}
             login: ${{ secrets.login }}
@@ -159,7 +158,7 @@ jobs:
         run: moodle-plugin-ci --ansi behat --suite classic
       
       - name: chrome classic
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         env:
             phone: ${{ secrets.phone }}
             login: ${{ secrets.login }}

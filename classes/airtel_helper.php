@@ -133,13 +133,13 @@ class airtel_helper {
         if ($this->is_testing($userphone)) {
             $result = [
                 'data' => [
-                    'transaction' => ['id' => '666666666', 'status' => 'SUCCESS']],
+                    'transaction' => ['id' => '666666666', 'status' => 'SUCCESS'], ],
                     'status' => [
                         'code' => '200',
                         'message' => 'SUCCESS',
                         'result_code' => 'ESB000010',
                         'response_code' => 'DP00800001006',
-                        'success' => true]];
+                        'success' => true, ], ];
         }
 
         $location = 'merchant/v1/payments/';
@@ -149,12 +149,12 @@ class airtel_helper {
             'subscriber' => [
                 'country' => strtoupper($usercountry),
                 'currency' => $currency,
-                'msisdn' => $userphone],
+                'msisdn' => $userphone, ],
             'transaction' => [
                 'amount' => $amount,
                 'country' => $this->country,
                 'currency' => $currency,
-                'id' => $transactionid]];
+                'id' => $transactionid, ], ];
         return $this->is_testing($userphone) ? $result : $this->request_post($location, $data, $headers);
     }
 
@@ -171,12 +171,12 @@ class airtel_helper {
                 'data' => [
                     'transaction' => [
                         'airtel_money_id' => 'CI210104.1549.C00029',
-                        'status' => 'SUCCESS']],
+                        'status' => 'SUCCESS', ], ],
                 'status' => [
                     'code' => '200',
                     'message' => 'SUCCESS',
                     'result_code' => 'ESB000010',
-                    'success' => true]];
+                    'success' => true, ], ];
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
@@ -198,13 +198,13 @@ class airtel_helper {
                            'airtel_money_id' => 'C3648.00993.538XX.XX67',
                            'id' => '666666666',
                            'message' => 'success',
-                           'status' => 'TS']],
+                           'status' => 'TS', ], ],
                 'status' => [
                     'code' => '200',
                     'message' => 'SUCCESS',
                     'result_code' => 'ESB000010',
                     'response_code' => 'DP00800001006',
-                    'success' => true]];
+                    'success' => true, ], ];
         }
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
         return $this->is_testing($transid) ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
@@ -248,7 +248,7 @@ class airtel_helper {
             $decoded = json_decode($result, true);
             // Trigger an event.
             $eventargs = ['context' => \context_system::instance(),
-                'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
+                'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded], ];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);
             $event->trigger();
             // Uncomment folowing line to have the data returned by Airtel.
@@ -329,7 +329,7 @@ class airtel_helper {
             'ESB000036' => 'Invalid MSISDN Length. MSISDN Length should be ? and should start with 0.',
             'ESB000039' => 'Vendor is not configured to do transaction in the country.',
             'ESB000041' => 'External transaction ID already exists.',
-            'ESB000045' => 'No transaction found with provided transaction Id.'];
+            'ESB000045' => 'No transaction found with provided transaction Id.', ];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
@@ -343,7 +343,7 @@ class airtel_helper {
             'TF' => 'Transaction Failed',
             'TS' => 'Transaction Success',
             'TA' => 'Transaction Ambiguous',
-            'TIP' => 'Transaction in Progress'];
+            'TIP' => 'Transaction in Progress', ];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
@@ -368,7 +368,7 @@ class airtel_helper {
             'DP00800001009' => 'Do not honor',
             'DP00800001010' => 'Transaction not permitted',
             'DP00800001024' => 'Transaction timed out',
-            'DP00800001025' => 'Transaction not found'];
+            'DP00800001025' => 'Transaction not found', ];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 

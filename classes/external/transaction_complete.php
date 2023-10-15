@@ -53,7 +53,7 @@ class transaction_complete extends external_api {
             'component' => new external_value(PARAM_COMPONENT, 'The component name'),
             'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
-            'transactionid' => new external_value(PARAM_TEXT, 'The transaction id coming back from Airtel Africa')
+            'transactionid' => new external_value(PARAM_TEXT, 'The transaction id coming back from Airtel Africa'),
         ]);
     }
 

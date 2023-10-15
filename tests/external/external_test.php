@@ -169,8 +169,8 @@ class external_test extends \advanced_testcase {
                 'currentcy' => 'USD',
                 'amount' => 66666,
                 'orderId' => 20,
-                'paymentId' => 333
-            ]
+                'paymentId' => 333,
+            ],
         ];
         $event = \paygw_airtelafrica\event\request_log::create($arr);
         $event->trigger();

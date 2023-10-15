@@ -62,7 +62,7 @@ class provider implements \core_privacy\local\metadata\provider,
             'paymentid' => 'privacy:metadata:paygw_airtelafrica:paymentid',
             'moneyid' => 'privacy:metadata:paygw_airtelafrica:moneyid',
             'timecreated' => 'privacy:metadata:paygw_airtelafrica:timecreated',
-            'timecompleted' => 'privacy:metadata:paygw_airtelafrica:timecompleted'];
+            'timecompleted' => 'privacy:metadata:paygw_airtelafrica:timecompleted', ];
         $collection->add_database_table('paygw_airtelafrica', $arr, 'privacy:metadata:paygw_airtelafrica');
         return $collection;
     }
