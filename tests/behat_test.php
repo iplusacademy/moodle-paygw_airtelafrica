@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Testing callback in Airtel Africa payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,33 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
-$plugin->release = 'v4.2.3';
-$plugin->version = 2023102100;
+/**
+ * Testing callback in Airtel Africa payments API
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class behat_test extends \advanced_testcase {
+
+    /**
+     * Setup function.
+     */
+    protected function setUp(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/payment/gateway/airtelafrica/tests/behat/behat_paygw_airtelafrica.php');
+        $this->resetAfterTest(true);
+    }
+
+    /**
+     * Test callback.
+     * @covers \behat_paygw_airtelafrica
+     */
+    public function test_behat() {
+        $behat = new \behat_paygw_airtelafrica();
+        $behat->i_configure_airtel();
+    }
+}

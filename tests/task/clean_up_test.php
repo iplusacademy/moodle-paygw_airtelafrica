@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Testing cleanup
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\task;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
-$plugin->release = 'v4.2.3';
-$plugin->version = 2023102100;
+/**
+ * Testing cleanup
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class clean_up_test extends \advanced_testcase {
+
+    /**
+     * Test clean up.
+     * @covers \paygw_airtelafrica\task\clean_up
+     */
+    public function test_clean_up() {
+        $this->resetAfterTest();
+        $task = new \paygw_airtelafrica\task\clean_up();
+        $task->get_name();
+        $task->execute();
+    }
+}

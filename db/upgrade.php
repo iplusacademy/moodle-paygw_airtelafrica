@@ -15,43 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Testing event logs
+ * paygw_airtelafrica upgrade script.
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace paygw_airtelafrica\event;
 
 /**
- * Testing event logs
+ * Upgrade script.
  *
- * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda
- * @author     Renaat Debleu <info@eWallah.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param int $oldversion
+ * @return bool always true
  */
-class request_log_test extends \advanced_testcase {
+function xmldb_paygw_airtelafrica_upgrade($oldversion) {
+    global $DB;
 
-    /**
-     * Test request_log.
-     * @covers \paygw_airtelafrica\event\request_log
-     */
-    public function test_gateway() {
-        $this->resetAfterTest();
-        $eventarray = [
-            'context' => \context_system::instance(),
-            'relateduserid' => 2,
-            'other' => [
-                'token' => 'faketoken',
-                'transaction' => ['id' => 'fakeid'],
-            ],
-        ];
-        $event = request_log::create($eventarray);
-        $event->trigger();
-        $event->get_name();
-        $event->get_description();
+    $dbman = $DB->get_manager();
+    if ($oldversion < 2023062800) {
+        $table = new xmldb_table('paygw_airtelafrica');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'enrol_fee', 'moneyid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('paymentarea', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'fee', 'component');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Plugin savepoint reached.
+        upgrade_plugin_savepoint(true, 2023062800, 'paygw', 'airtelafrica');
     }
+    return true;
 }

@@ -76,29 +76,38 @@ class gateway extends \core_payment\gateway {
      * @param \core_payment\form\account_gateway $form
      */
     public static function add_configuration_to_gateway_form(\core_payment\form\account_gateway $form): void {
-        $arr = ['brandname', 'clientid', 'secret', 'live', 'sandbox', 'environment', 'country'];
-        $strs = get_strings($arr, 'paygw_airtelafrica');
+        $arr = ['brandname', 'clientid', 'clientidsb', 'secret', 'secretsb', 'live', 'sandbox', 'environment', 'country'];
+        $txt = 'paygw_airtelafrica';
+        $strs = get_strings($arr, $txt);
         $mform = $form->get_mform();
 
         $mform->addElement('text', 'brandname', $strs->brandname);
         $mform->setType('brandname', PARAM_TEXT);
-        $mform->addHelpButton('brandname', 'brandname', 'paygw_airtelafrica');
+        $mform->addHelpButton('brandname', 'brandname', $txt);
 
         $mform->addElement('text', 'clientid', $strs->clientid);
         $mform->setType('clientid', PARAM_RAW_TRIMMED);
-        $mform->addHelpButton('clientid', 'clientid', 'paygw_airtelafrica');
+        $mform->addHelpButton('clientid', 'clientid', $txt);
 
         $mform->addElement('passwordunmask', 'secret', $strs->secret);
         $mform->setType('secret', PARAM_RAW_TRIMMED);
-        $mform->addHelpButton('secret', 'secret', 'paygw_airtelafrica');
+        $mform->addHelpButton('secret', 'secret', $txt);
+
+        $mform->addElement('text', 'clientidsb', $strs->clientidsb);
+        $mform->setType('clientidsb', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('clientidsb', 'clientidsb', $txt);
+
+        $mform->addElement('passwordunmask', 'secretsb', $strs->secretsb);
+        $mform->setType('secretsb', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('secretsb', 'secretsb', $txt);
 
         $options = self::get_supported_countries();
         $mform->addElement('select', 'country', $strs->country, $options, 'UG');
-        $mform->addHelpButton('country', 'country', 'paygw_airtelafrica');
+        $mform->addHelpButton('country', 'country', $txt);
 
         $options = ['live' => $strs->live, 'sandbox' => $strs->sandbox];
         $mform->addElement('select', 'environment', $strs->environment, $options);
-        $mform->addHelpButton('environment', 'environment', 'paygw_airtelafrica');
+        $mform->addHelpButton('environment', 'environment', $txt);
 
         $mform->addRule('clientid', get_string('required'), 'required', null, 'client');
         $mform->addRule('secret', get_string('required'), 'required', null, 'client');
@@ -114,8 +123,10 @@ class gateway extends \core_payment\gateway {
      */
     public static function validate_gateway_form(
         \core_payment\form\account_gateway $form, \stdClass $data, array $files, array &$errors): void {
-        if ($data->enabled && (empty($data->clientid) || empty($data->secret))) {
-            $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');
+        if ($data->enabled) {
+            if (empty($data->clientid) || empty($data->secret) || empty($data->clientidsb) || empty($data->secretsb)) {
+                $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');
+            }
         }
     }
 }

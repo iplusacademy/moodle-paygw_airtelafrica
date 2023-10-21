@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Library file.
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
-$plugin->release = 'v4.2.3';
-$plugin->version = 2023102100;
+/**
+ * Security check.
+ *
+ * @return array
+ */
+function paygw_airtelafrica_security_checks(): array {
+    return [new \paygw_airtelafrica\check\airtelafrica()];
+}

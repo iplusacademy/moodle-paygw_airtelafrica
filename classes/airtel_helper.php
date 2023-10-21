@@ -25,12 +25,9 @@
 
 namespace paygw_airtelafrica;
 
+use core_payment\helper;
+use core_text;
 use curl;
-use stdClass;
-
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
-
 
 /**
  * Contains helper class to work with Airtel Africa REST API.
@@ -45,12 +42,12 @@ class airtel_helper {
     /**
      * @var string The base API URL
      */
-    public $airtelurl;
+    private $airtelurl;
 
     /**
      * @var string Client ID
      */
-    private $clientid;
+    public $clientid;
 
     /**
      * @var string Airtel Africa App secret
@@ -63,6 +60,11 @@ class airtel_helper {
     private $country;
 
     /**
+     * @var bool Sandbox
+     */
+    private $sandbox;
+
+    /**
      * @var string The oath bearer token
      */
     public $token;
@@ -73,40 +75,42 @@ class airtel_helper {
     public $testing;
 
     /**
-     * helper constructor.
+     * Helper constructor.
      *
-     * @param string $clientid The client id.
-     * @param string $secret Airtel Africa secret.
+     * @param array $config The gateway configuration.
      * @param string $country Airtel Africa location.
-     * @param string $sandbox Whether we are working with the sandbox environment or not.
      */
-    public function __construct(
-        string $clientid, string $secret, string $country = 'UG', string $sandbox = 'sandbox') {
-        $this->clientid = $clientid;
-        $this->secret = $secret;
-        $this->airtelurl = self::get_baseurl($sandbox);
-        $this->country = $country;
-        $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
+    public function __construct(array $config, string $country = 'UG') {
+        $this->sandbox = (bool)strtolower($config['environment']) == 'sandbox';
+        $this->clientid = $config[$this->sandbox ? 'clientidsb' : 'clientid'];
+        $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
+        $this->airtelurl = $this::get_baseurl();
+        $this->country = array_key_exists('country', $config) ? $config['country'] : $country;
+        $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
+        if ($this->testing) {
+            $this->sandbox = true;
+        }
     }
 
     /**
      * Which url should be used.
      *
-     * @param string $sandbox
      * @return string
      */
-    private static function get_baseurl(string $sandbox): string {
-        return $sandbox == 'sandbox' ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
+    private function get_baseurl(): string {
+        return $this->sandbox ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
     }
 
     /**
      * Are we testing?
      *
+     * We assume there is no user with telephone number 666666666
+     *
      * @param string $id
      * @return bool
      */
     private function is_testing(string $id): bool {
-        return $this->testing && $id === '66666666';
+        return defined('BEHAT_SITE_RUNNING') ? $id == '666666666' : $this->testing && $id == '666666666';
     }
 
     /**
@@ -125,28 +129,37 @@ class airtel_helper {
         if ($this->is_testing($userphone)) {
             $result = [
                 'data' => [
-                    'transaction' => ['id' => '8334msn88', 'status' => 'SUCCESS']],
-                    'status' => [
-                        'code' => '200',
-                        'message' => 'SUCCESS',
-                        'result_code' => 'ESB000010',
-                        'response_code' => 'DP00800001006',
-                        'success' => true]];
+                    'transaction' => [
+                        'id' => '666666666',
+                        'status' => 'SUCCESS',
+                    ],
+                ],
+                'status' => [
+                    'code' => '200',
+                    'message' => 'SUCCESS',
+                    'result_code' => 'ESB000010',
+                    'response_code' => 'DP00800001006',
+                    'success' => true,
+                ],
+            ];
         }
 
         $location = 'merchant/v1/payments/';
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = [
-            'reference' => $reference,
+            'reference' => substr($reference, 0, 64),
             'subscriber' => [
                 'country' => strtoupper($usercountry),
                 'currency' => $currency,
-                'msisdn' => $userphone],
+                'msisdn' => $userphone,
+            ],
             'transaction' => [
                 'amount' => $amount,
                 'country' => $this->country,
                 'currency' => $currency,
-                'id' => $transactionid]];
+                'id' => $transactionid,
+            ],
+        ];
         return $this->is_testing($userphone) ? $result : $this->request_post($location, $data, $headers);
     }
 
@@ -163,12 +176,16 @@ class airtel_helper {
                 'data' => [
                     'transaction' => [
                         'airtel_money_id' => 'CI210104.1549.C00029',
-                        'status' => 'SUCCESS']],
+                        'status' => 'SUCCESS',
+                    ],
+                ],
                 'status' => [
                     'code' => '200',
                     'message' => 'SUCCESS',
                     'result_code' => 'ESB000010',
-                    'success' => true]];
+                    'success' => true,
+                ],
+            ];
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
@@ -187,16 +204,20 @@ class airtel_helper {
             $result = [
                 'data' => [
                     'transaction' => [
-                           'airtel_money_id' => 'C3648.00993.538XX.XX67',
-                           'id' => '8334msn88',
-                           'message' => 'success',
-                           'status' => 'TS']],
+                       'airtel_money_id' => 'C3648.00993.538XX.XX67',
+                       'id' => '666666666',
+                       'message' => 'success',
+                       'status' => 'TS',
+                    ],
+                ],
                 'status' => [
-                    'code' => 200,
+                    'code' => '200',
                     'message' => 'SUCCESS',
                     'result_code' => 'ESB000010',
                     'response_code' => 'DP00800001006',
-                    'success' => true]];
+                    'success' => true,
+                ],
+            ];
         }
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
         return $this->is_testing($transid) ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
@@ -211,9 +232,9 @@ class airtel_helper {
      * @param string $verb
      * @return array Decoded API response.
      */
-    private function request_post(
-        string $location, array $data, array $headers = [], string $verb = 'POST'): array {
-        $decoded = $result = '';
+    private function request_post(string $location, array $data, array $headers = [], string $verb = 'POST'): array {
+        $decoded = [];
+        $result = '';
         $client = new \GuzzleHttp\Client();
         if ($this->token == '') {
             $authdata = ['client_id' => $this->clientid, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials'];
@@ -224,8 +245,8 @@ class airtel_helper {
                     ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]);
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                $this->token = '';
+            } catch (\Exception $e) {
+                mtrace_exception($e);
                 return [];
             }
         }
@@ -234,17 +255,104 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
-            // TODO: Bad gateway.
+            mtrace_exception($e);
             $result = $e->getMessage();
         } finally {
             $decoded = json_decode($result, true);
             // Trigger an event.
-            $eventargs = ['context' => \context_system::instance(),
-                'other' => ['verb' => $verb, 'location' => $location, 'token' => $this->token, 'result' => $decoded]];
+            $eventargs = [
+                'context' => \context_system::instance(),
+                'other' => [
+                    'verb' => $verb,
+                    'location' => $location,
+                    'token' => $this->token,
+                    'result' => $decoded,
+                ],
+            ];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);
             $event->trigger();
+            // Uncomment folowing line to have the data returned by Airtel.
+            // mtrace($result);.
         }
-        return $decoded;
+
+        return $decoded ?? [];
+    }
+
+    /**
+     * Enrol the user
+     *
+     * @param string $transactionid
+     * @param int $itemid
+     * @param string $component Name of the component that the itemid belongs to
+     * @param string $area The payment area
+     * @return string
+     */
+    public function enrol_user(string $transactionid, int $itemid, string $component, string $area): string {
+        global $DB;
+        // We assume the transaction failed.
+        $trans = 'TF';
+        $cond = ['transactionid' => $transactionid, 'paymentid' => $itemid];
+        if ($rec = $DB->get_record('paygw_airtelafrica', $cond)) {
+            if ($rec->timecompleted == 0) {
+                $this->token = $rec->moneyid;
+                $payable = helper::get_payable($component, $area, $itemid);
+                $currency = $payable->get_currency();
+                $result = $this->transaction_enquiry($transactionid, $currency);
+                $status = self::array_helper('status', $result);
+                $data = self::array_helper('data', $result);
+                if ($status && $data && $status['code'] == '200') {
+                    $transaction = self::array_helper('transaction', $data);
+                    if ($transaction) {
+                        $trans = $transaction['status'];
+                        // If the payment was successul.
+                        if ($trans == 'TS') {
+                            // We have a succesfull transaction.
+                            $moneyid = self::array_helper('airtel_money_id', $transaction);
+                            $surcharge = helper::get_gateway_surcharge('airtelafrica');
+                            $amount = helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+                            $payid = $payable->get_account_id();
+                            $saved = helper::save_payment(
+                                $payid,
+                                $component,
+                                $area,
+                                $itemid,
+                                $rec->userid,
+                                $amount,
+                                $currency,
+                                'airtelafrica');
+                            helper::deliver_order($component, $area, $itemid, $saved, $rec->userid);
+                            $DB->set_field('paygw_airtelafrica', 'timecompleted', time(), $cond);
+                            $DB->set_field('paygw_airtelafrica', 'moneyid', $moneyid, $cond);
+                        }
+                    }
+                }
+            }
+        }
+        return $trans;
+    }
+
+    /**
+     * Transaction code
+     * @param string $code
+     * @return string
+     */
+    public static function esb_code(string $code): string {
+        $returns = [
+            'ESB000001' => 'Something went wrong.',
+            'ESB000004' => 'An error occurred while initiating the payment.',
+            'ESB000008' => 'Field validation.',
+            'ESB000011' => 'Transaction failed.',
+            'ESB000010' => 'Your transaction has been successfully processed.',
+            'ESB000014' => 'An error occurred while fetching the transaction status.',
+            'ESB000033' => 'Invalid MSISDN Length. MSISDN Length should be ',
+            'ESB000034' => 'Invalid Country Name.',
+            'ESB000035' => 'Invalid Currency Code.',
+            'ESB000036' => 'Invalid MSISDN Length. MSISDN Length should be ? and should start with 0.',
+            'ESB000039' => 'Vendor is not configured to do transaction in the country.',
+            'ESB000041' => 'External transaction ID already exists.',
+            'ESB000045' => 'No transaction found with provided transaction Id.',
+        ];
+        return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
     /**
@@ -257,17 +365,21 @@ class airtel_helper {
             'TF' => 'Transaction Failed',
             'TS' => 'Transaction Success',
             'TA' => 'Transaction Ambiguous',
-            'TIP' => 'Transaction in Progress'];
+            'TIP' => 'Transaction in Progress',
+        ];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
     /**
      * Return code
+     *
+     * Collection api DP008 specific codes.
      * @param string $code
      * @return string
      */
     public static function dp_code(string $code): string {
         $returns = [
+            'DP00800001000' => 'Transaction ambigous',
             'DP00800001001' => 'Valid pin',
             'DP00800001002' => 'Invalid pin',
             'DP00800001003' => 'Exceeds balance',
@@ -278,27 +390,40 @@ class airtel_helper {
             'DP00800001008' => 'Refused',
             'DP00800001009' => 'Do not honor',
             'DP00800001010' => 'Transaction not permitted',
-            'DP00800001024' => 'Transaction timed out'];
+            'DP00800001024' => 'Transaction timed out',
+            'DP00800001025' => 'Transaction not found',
+            'DP00800001029' => 'Transaction expired',
+        ];
         return array_key_exists($code, $returns) ? $returns[$code] : '';
     }
 
     /**
-     * Router code
-     * @param string $code
-     * @return string
+     * Array helper.
+     *
+     * @param string $key
+     * @param array $arr
+     * @return array||bool
      */
-    public static function rr_code(string $code): string {
-        $returns = [
-            'ROUTER001' => 'The wallet is not configured.',
-            'ROUTER003' => 'Mandatory parameters are missing either in the header or body.',
-            'ROUTER005' => 'Country route is not configured.',
-            'ROUTER006' => 'Invalid country code provided.',
-            'ROUTER007' => 'Not authorized to perform any operations in the provided country.',
-            'ROUTER112' => 'Invalid currency provided.',
-            'ROUTER114' => 'An error occurred while validating the pin.',
-            'ROUTER115' => 'Pin you have entered is incorrect.',
-            'ROUTER116' => 'The encrypted value of the pin is incorrect. Kindly re-check the encryption mechanism.',
-            'ROUTER117' => 'An error occurred while generating the response.'];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
+    public static function array_helper(string $key, array $arr) {
+        return (array_key_exists($key, $arr)) ? $arr[$key] : false;
+    }
+
+    /**
+     * User data helper.
+     *
+     * @return array
+     */
+    public function current_user_data() {
+        global $USER;
+        $arr = [];
+        $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
+        if ($user) {
+            $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
+            $phone = preg_replace("/[^0-9]/", '', $phone);
+            if (strlen($phone) > 5) {
+                $arr = ['id' => $user->id, 'country' => strtoupper($user->country), 'phone' => $phone];
+            }
+        }
+        return $arr;
     }
 }

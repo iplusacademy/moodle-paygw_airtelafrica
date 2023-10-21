@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,31 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\external;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
-$plugin->release = 'v4.2.3';
-$plugin->version = 2023102100;
+use core_external\external_api;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+
+/**
+ * Testing externals in payments API
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
+ */
+class get_config_for_js_test extends \externallib_advanced_testcase {
+
+    /**
+     * Test external config for js.
+     * @covers \paygw_airtelafrica\external\get_config_for_js
+     */
+    public function test_config_for_js() {
+        $this->assertInstanceOf('\core_external\external_function_parameters', get_config_for_js::execute_parameters());
+        $this->assertInstanceOf('\core_external\external_single_structure', get_config_for_js::execute_returns());
+    }
+}

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,12 +23,31 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica\external;
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
-$plugin->release = 'v4.2.3';
-$plugin->version = 2023102100;
+use core_external\external_api;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+
+/**
+ * Testing externals in payments API
+ *
+ * @package    paygw_airtelafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
+ */
+class transaction_start_test extends \externallib_advanced_testcase {
+
+    /**
+     * Test transaction start.
+     * @covers \paygw_airtelafrica\external\transaction_start
+     */
+    public function test_transaction_start() {
+        $this->assertInstanceOf('\core_external\external_function_parameters', transaction_start::execute_parameters());
+        $this->assertInstanceOf('\core_external\external_single_structure', transaction_start::execute_returns());
+    }
+}

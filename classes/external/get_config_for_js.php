@@ -28,10 +28,8 @@ declare(strict_types=1);
 namespace paygw_airtelafrica\external;
 
 use core_payment\helper;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
+use paygw_airtelafrica\airtel_helper;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
@@ -68,39 +66,26 @@ class get_config_for_js extends external_api {
      * @return string[]
      */
     public static function execute(string $component, string $paymentarea, int $itemid): array {
-        global $USER;
+
         $gateway = 'airtelafrica';
-        self::validate_parameters(self::execute_parameters(), [
-            'component' => $component,
-            'paymentarea' => $paymentarea,
-            'itemid' => $itemid,
-        ]);
-        $phone = get_string('statusunknown');
-        $country = 'UG';
-        $userid = 1;
-        $user = \core_user::get_user($USER->id);
-        if ($user) {
-            $userid = $user->id;
-            $country = strtoupper($user->country);
-            $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
-        }
-        $config = (object)helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $arr = ['component' => $component, 'paymentarea' => $paymentarea, 'itemid' => $itemid];
+        self::validate_parameters(self::execute_parameters(), $arr);
+
+        $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
+        $helper = new airtel_helper($config);
+        $user = $helper->current_user_data();
         $payable = helper::get_payable($component, $paymentarea, $itemid);
-        $amount = $payable->get_amount();
         $currency = $payable->get_currency();
-        $surcharge = helper::get_gateway_surcharge($gateway);
-        $cost = helper::get_rounded_cost($amount, $currency, $surcharge);
-        $reference = "$component $paymentarea $itemid $userid";
         return [
-            'clientid' => $config->clientid,
-            'brandname' => $config->brandname,
-            'country' => $config->country,
-            'cost' => $cost,
+            'clientid' => $helper->clientid,
+            'brandname' => $config['brandname'],
+            'country' => $config['country'],
+            'cost' => helper::get_rounded_cost($payable->get_amount(), $currency, helper::get_gateway_surcharge($gateway)),
             'currency' => $currency,
-            'phone' => $phone,
-            'usercountry' => $country,
-            'userid' => $userid,
-            'reference' => $reference,
+            'phone' => $user['phone'],
+            'usercountry' => $user['country'],
+            'timeout' => $helper->testing ? 1000 : 20000,
+            'reference' => implode(' ', [$component, $paymentarea, $itemid, $user['id']]),
         ];
     }
 
@@ -114,11 +99,11 @@ class get_config_for_js extends external_api {
             'clientid' => new external_value(PARAM_TEXT, 'Airtel Africa client ID'),
             'brandname' => new external_value(PARAM_TEXT, 'Brand name'),
             'country' => new external_value(PARAM_TEXT, 'Client country'),
-            'cost' => new external_value(PARAM_FLOAT, 'Cost with surcharge'),
-            'currency' => new external_value(PARAM_TEXT, 'Currency'),
+            'cost' => new external_value(PARAM_FLOAT, 'Amount (with surcharge) that will be debited from the payer account.'),
+            'currency' => new external_value(PARAM_TEXT, 'ISO4217 Currency code'),
             'phone' => new external_value(PARAM_TEXT, 'User mobile phone'),
             'usercountry' => new external_value(PARAM_TEXT, 'User country'),
-            'userid' => new external_value(PARAM_INT, 'User id'),
+            'timeout' => new external_value(PARAM_INT, 'Timout'),
             'reference' => new external_value(PARAM_TEXT, 'Reference'),
         ]);
     }

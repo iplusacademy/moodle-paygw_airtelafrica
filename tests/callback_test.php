@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Coverage info
+ * Testing callback in Airtel Africa payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,26 +23,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace paygw_airtelafrica;
 
 /**
- * Coverage info
+ * Testing callback in Airtel Africa payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-return new class extends phpunit_coverage_info {
-    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
-    protected $includelistfolders = ['classes'];
+class callback_test extends \advanced_testcase {
 
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
+    /**
+     * Setup function.
+     */
+    protected function setUp(): void {
+        $this->resetAfterTest(true);
+    }
 
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = ['db', 'lang', 'tests/behat'];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
-};
+    /**
+     * Test callback.
+     * @coversNothing
+     */
+    public function test_callback() {
+        $client = new \GuzzleHttp\Client();
+        $authdata = ['client_id' => 'fakeclientid', 'client_secret' => 'fakesecret', 'grant_type' => 'client_credentials'];
+        $headers = ['Content-Type' => 'application/json'];
+        $url = 'https://test.medical-access.org/payment/gateway/airtelafrica/callback.php';
+        $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $authdata]);
+        $result = json_decode($response->getBody()->getContents(), true);
+        $this->assertEmpty($result);
+    }
+}

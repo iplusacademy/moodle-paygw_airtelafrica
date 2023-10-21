@@ -27,19 +27,40 @@
     * none
 
     Example context (json):
-    {}
-
+    {
+        "sesskey": "sesskey",
+        "phone": "666666666",
+        "country": "UG",
+        "component": "enrol_fee",
+        "paymentarea": "fee",
+        "transactionid": "999999999",
+        "itemid": "8",
+        "description": "description",
+        "reference": "reference"
+    }
 }}
+
 <div id="airtel-image" class="bg-grey mb-4 w-100 text-center">
-    <img src="/payment/gateway/airtelafrica/pix/img.png" title="{{#str}} plugin, paygw_airtelafrica {{/str}}" alt="{{#str}} plugin, paygw_airtelafrica {{/str}}">
+    <img src="/payment/gateway/airtelafrica/pix/img.png" title="{{#str}} pluginname, paygw_airtelafrica {{/str}}" alt="{{#str}} pluginname, paygw_airtelafrica {{/str}}">
 </div>
 <div class="mb-4 w-100 text-center font-italic">{{#str}} airtelstart, paygw_airtelafrica {{/str}}</div>
 <div id="airtel-spinner" class="text-center mb-4 w-100 row">
     <span style="margin: auto;">{{#pix}} i/ajaxloader, core, Working {{/pix}}</span>
 </div>
 <div class="text-center">
-    <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay" disabled>
-    <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="airtel-cancel" class="airtel-pay btn btn-secondary" data-for="enablepay">
+    <form id="airtel-form" action="/payment/gateway/airtelafrica/continue.php" method="post">
+        <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay" disabled>
+        <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="airtel-cancel" class="airtel-pay btn btn-secondary" data-for="enablepay">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="phone" value="{{phone}}">
+        <input type="hidden" name="country" value="{{country}}">
+        <input type="hidden" name="component" value="{{component}}">
+        <input type="hidden" name="paymentarea" value="{{paymentarea}}">
+        <input type="hidden" name="itemid" value="{{itemid}}">
+        <input type="hidden" name="transactionid" value="{{transactionid}}">
+        <input type="hidden" name="description" value="{{description}}">
+        <input type="hidden" name="reference" value="{{reference}}">
+    </form>
 </div>
 <div id="airtel-progress" class="mt-4 mb-4 w-100 row">
     <div class="text-center w-100">

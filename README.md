@@ -31,7 +31,7 @@ To set up access within Moodle you will need to:
 
 - Register a new application:  Airtel Africa have their [own docs](https://developers.airtel.africa/developer) on this.
 - Enable the Collection-APIs and in the settings select the countries where you want to accept money from.
-- Configure the callback url in your Application settings. The URL is in the format "https://example.com/payment/gateway/airtelafrica/callback.php". Make a phone call to your local Airtel representative so your submitted request is accepted. Yes, somebody at Airtel Africa needs to turn a switch before your changes take effect. Hope for the best. I never made my phone call, my dashboard tells me the APIs are enabled, but after more than 5 months none of the APIs work ...
+- Configure the callback url in your Application settings. The URL is in the format "example.com/payment/gateway/airtelafrica/callback.php". Make a phone call to your local Airtel representative so your submitted request is accepted. Yes, somebody at Airtel Africa needs to turn a switch before your changes take effect. Hope for the best. I never made my phone call, my dashboard tells me the APIs are enabled, but after more than 5 months none of the APIs work ...
 - For every change, callback url, going live, enabling extra APIs, ... see previous line.
 - If you want to test this plugin in the sandbox environment, contact your local Airtel representative. He/she will *manually* confirm your test payment.
 - Do __NOT__ rely on the sandbox environment, sometimes this service just stops working. If you are lucky, everything returns to normal after a week
@@ -74,6 +74,19 @@ This plugin is developed and tested using
 * MYSQL
 * MariaDB
 * PostgreSQL
+
+## Testing
+
+This plugin can be tested in PHPUnit and Behat, but you need to add your phone - login - secret key as an environment variable.
+
+* env phone=???? login=???? secret=???? vendor/bin/phpunit --coverage-text payment/gateway/airtelafrica/
+* env phone=???? login=???? secret=???? vendor/bin/behat --tags='paygw_airtelafrica'
+
+Or you can use secrets in Github actions:
+
+* gh secret set phone -b"?????"
+* gh secret set login -b"?????"
+* gh secret set secret -b"?????"
 
 ## Plugin repositories
 

@@ -38,7 +38,7 @@ $functions = [
         'classname' => \paygw_airtelafrica\external\transaction_start::class,
         'methodname' => 'execute',
         'description' => 'Returns a new transaction id',
-        'type' => 'read',
+        'type' => 'write',
         'ajax' => true,
         'loginrequired' => true,
     ],

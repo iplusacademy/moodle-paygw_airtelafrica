@@ -15,34 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Coverage info
+ * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace paygw_airtelafrica\external;
+
+use core_external\external_api;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
- * Coverage info
+ * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
  */
-return new class extends phpunit_coverage_info {
-    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
-    protected $includelistfolders = ['classes'];
+class transaction_complete_test extends \externallib_advanced_testcase {
 
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
-
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = ['db', 'lang', 'tests/behat'];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
-};
+    /**
+     * Test transaction complete.
+     * @covers \paygw_airtelafrica\external\transaction_complete
+     */
+    public function test_transaction_complete() {
+        $this->assertInstanceOf('\core_external\external_function_parameters', transaction_complete::execute_parameters());
+        $this->assertInstanceOf('\core_external\external_single_structure', transaction_complete::execute_returns());
+    }
+}
