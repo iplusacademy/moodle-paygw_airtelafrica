@@ -39,7 +39,7 @@ class clean_up_test extends \advanced_testcase {
      * Test clean up.
      * @covers \paygw_airtelafrica\task\clean_up
      */
-    public function test_clean_up() {
+    public function test_clean_up(): void {
         $this->resetAfterTest();
         $task = new \paygw_airtelafrica\task\clean_up();
         $task->get_name();

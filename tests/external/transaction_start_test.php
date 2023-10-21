@@ -46,7 +46,7 @@ class transaction_start_test extends \externallib_advanced_testcase {
      * Test transaction start.
      * @covers \paygw_airtelafrica\external\transaction_start
      */
-    public function test_transaction_start() {
+    public function test_transaction_start(): void {
         $this->assertInstanceOf('\core_external\external_function_parameters', transaction_start::execute_parameters());
         $this->assertInstanceOf('\core_external\external_single_structure', transaction_start::execute_returns());
     }

@@ -57,7 +57,7 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\event\request_log
      */
-    public function test_empty_helper() {
+    public function test_empty_helper(): void {
         $helper = new airtel_helper($this->config);
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
         $this->assertEquals('Transaction Success', airtel_helper::ta_code('TS'));
@@ -75,7 +75,7 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\event\request_log
      */
-    public function test_callback_manualy() {
+    public function test_callback_manualy(): void {
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => '666666666']);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
@@ -99,7 +99,7 @@ class airtel_helper_test extends \advanced_testcase {
      * Test enrol Airtel Africa payment
      * @covers \paygw_airtelafrica\airtel_helper
      */
-    public function test_enrol_manualy() {
+    public function test_enrol_manualy(): void {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
@@ -121,7 +121,7 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\event\request_log
      */
-    public function test_airtel_manualy() {
+    public function test_airtel_manualy(): void {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
@@ -155,7 +155,7 @@ class airtel_helper_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\airtel_helper
      * @covers \paygw_airtelafrica\event\request_log
      */
-    public function test_airtel_payment() {
+    public function test_airtel_payment(): void {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }

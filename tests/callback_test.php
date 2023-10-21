@@ -46,7 +46,7 @@ class callback_test extends \advanced_testcase {
      * Test callback.
      * @coversNothing
      */
-    public function test_callback() {
+    public function test_callback(): void {
         $client = new \GuzzleHttp\Client();
         $authdata = ['client_id' => 'fakeclientid', 'client_secret' => 'fakesecret', 'grant_type' => 'client_credentials'];
         $headers = ['Content-Type' => 'application/json'];

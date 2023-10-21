@@ -46,7 +46,7 @@ class get_config_for_js_test extends \externallib_advanced_testcase {
      * Test external config for js.
      * @covers \paygw_airtelafrica\external\get_config_for_js
      */
-    public function test_config_for_js() {
+    public function test_config_for_js(): void {
         $this->assertInstanceOf('\core_external\external_function_parameters', get_config_for_js::execute_parameters());
         $this->assertInstanceOf('\core_external\external_single_structure', get_config_for_js::execute_returns());
     }

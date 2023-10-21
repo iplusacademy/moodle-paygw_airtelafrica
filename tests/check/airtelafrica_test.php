@@ -39,7 +39,7 @@ class airtelafrica_test extends \advanced_testcase {
      * Test checks.
      * @covers \paygw_airtelafrica\check\airtelafrica
      */
-    public function test_checks() {
+    public function test_checks(): void {
         global $CFG;
         require_once($CFG->dirroot . '/payment/gateway/airtelafrica/lib.php');
         $checks = paygw_airtelafrica_security_checks();

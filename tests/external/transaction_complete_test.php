@@ -46,7 +46,7 @@ class transaction_complete_test extends \externallib_advanced_testcase {
      * Test transaction complete.
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
-    public function test_transaction_complete() {
+    public function test_transaction_complete(): void {
         $this->assertInstanceOf('\core_external\external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('\core_external\external_single_structure', transaction_complete::execute_returns());
     }

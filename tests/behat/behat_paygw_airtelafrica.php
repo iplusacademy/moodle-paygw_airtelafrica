@@ -44,7 +44,7 @@ class behat_paygw_airtelafrica extends behat_base {
      * Get the secrets from the environment.
      * @Then I configure airtel
      */
-    public function i_configure_airtel() {
+    public function i_configure_airtel(): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/enrol/locallib.php');
         set_config('country', 'UG');

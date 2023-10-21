@@ -52,7 +52,7 @@ class gateway_test extends \advanced_testcase {
      * Test gateway.
      * @covers \paygw_airtelafrica\gateway
      */
-    public function test_gateway() {
+    public function test_gateway(): void {
         $this->assertCount(14, gateway::get_supported_currencies());
         $errors = [];
         $gateway = $this->account->get_gateways()['airtelafrica'];
@@ -67,7 +67,7 @@ class gateway_test extends \advanced_testcase {
      * Test create account.
      * @covers \paygw_airtelafrica\gateway
      */
-    public function test_create_account() {
+    public function test_create_account(): void {
         global $DB;
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
         $this->assertTrue($generator instanceof \core_payment_generator);
@@ -88,7 +88,7 @@ class gateway_test extends \advanced_testcase {
      * Test create payment.
      * @covers \paygw_airtelafrica\gateway
      */
-    public function test_create_payment() {
+    public function test_create_payment(): void {
         global $DB;
         $user = $this->getDataGenerator()->create_user(['phone1' => '888888888']);
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
@@ -101,7 +101,7 @@ class gateway_test extends \advanced_testcase {
      *
      * @covers \paygw_airtelafrica\gateway
      */
-    public function test_get_payable() {
+    public function test_get_payable(): void {
         global $DB;
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         $feeplugin = enrol_get_plugin('fee');

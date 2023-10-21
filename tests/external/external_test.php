@@ -80,7 +80,7 @@ class external_test extends \advanced_testcase {
      * Test external config for js.
      * @covers \paygw_airtelafrica\external\get_config_for_js
      */
-    public function test_config_for_js() {
+    public function test_config_for_js(): void {
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertEquals('UG', $result['country']);
     }
@@ -89,7 +89,7 @@ class external_test extends \advanced_testcase {
      * Test external transaction_start.
      * @covers \paygw_airtelafrica\external\transaction_start
      */
-    public function test_transaction_start() {
+    public function test_transaction_start(): void {
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertArrayHasKey('message', $result);
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
@@ -102,7 +102,7 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_start
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
-    public function test_transaction_complete() {
+    public function test_transaction_complete(): void {
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666');
         $this->assertArrayHasKey('success', $result);
@@ -116,7 +116,7 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_start
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
-    public function test_complete_cycle() {
+    public function test_complete_cycle(): void {
         if ($this->config['clientidsb'] == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
         }
@@ -154,7 +154,7 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      * @covers \paygw_airtelafrica\airtel_helper
      */
-    public function test_request_log() {
+    public function test_request_log(): void {
         global $DB;
         $generator = $this->getDataGenerator();
         $user = $generator->create_user();
@@ -182,7 +182,7 @@ class external_test extends \advanced_testcase {
      * Test payable.
      * @covers \paygw_airtelafrica\external\get_config_for_js
      */
-    public function test_payable() {
+    public function test_payable(): void {
         global $CFG;
         $generator = $this->getDataGenerator();
         $user = $generator->create_user();
