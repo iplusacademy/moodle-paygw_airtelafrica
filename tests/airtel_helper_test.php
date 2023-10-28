@@ -223,4 +223,22 @@ class airtel_helper_test extends \advanced_testcase {
             }
         }
     }
+
+    /**
+     * Test plugin.
+     * @covers \paygw_airtelafrica\airtel_helper
+     */
+    public function test_plugin() {
+        $helper = new airtel_helper($this->config);
+        $name = '\\paygw_airtelafrica\\airtel_helper';
+        $return = \phpunit_util::call_internal_method($helper, 'get_baseurl', [], $name);
+        $this->assertEquals('https://openapiuat.airtel.africa/', $return);
+        $return = \phpunit_util::call_internal_method($helper, 'get_base', [], $name);
+        $this->assertEquals('sandbox', $return);
+        $return = \phpunit_util::call_internal_method($helper, 'is_testing', ['666666666'], $name);
+        $this->assertTrue($return);
+        $class = new \ReflectionClass('\\paygw_airtelafrica\\airtel_helper');
+        $this->assertCount(14, $class->getMethods());
+        $this->assertCount(7, $class->getProperties());
+    }
 }

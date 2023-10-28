@@ -102,6 +102,15 @@ class airtel_helper {
     }
 
     /**
+     * Production or sandbox.
+     *
+     * @return string
+     */
+    private function get_base(): string {
+        return $this->sandbox ? 'sandbox' : 'production';
+    }
+
+    /**
      * Are we testing?
      *
      * We assume there is no user with telephone number 666666666
@@ -264,7 +273,7 @@ class airtel_helper {
                 'context' => \context_system::instance(),
                 'other' => [
                     'verb' => $verb,
-                    'location' => $location,
+                    'location' => $this->get_base() . ':' . $location,
                     'token' => $this->token,
                     'result' => $decoded,
                 ],
