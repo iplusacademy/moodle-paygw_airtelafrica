@@ -199,7 +199,7 @@ class airtel_helper_test extends \advanced_testcase {
      * Ping payment
      * @param string $transactionid
      */
-    private function ping_payment(string $transactionid) {
+    private function ping_payment(string $transactionid): void {
         if ($transactionid == '0') {
             throw new \moodle_exception('Invalid transaction id.');
         }
@@ -228,7 +228,7 @@ class airtel_helper_test extends \advanced_testcase {
      * Test plugin.
      * @covers \paygw_airtelafrica\airtel_helper
      */
-    public function test_plugin() {
+    public function test_plugin(): void {
         $helper = new airtel_helper($this->config);
         $name = '\\paygw_airtelafrica\\airtel_helper';
         $return = \phpunit_util::call_internal_method($helper, 'get_baseurl', [], $name);
