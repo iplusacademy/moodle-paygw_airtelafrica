@@ -9,13 +9,6 @@ jobs:
     name: ci
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        moodle-branch: ['MOODLE_402_STABLE']
-        php: ['8.1']
-        database: ['mysqli']
-
     steps:
       - name: checkout plugin
         uses: actions/checkout@v3
@@ -25,7 +18,7 @@ jobs:
       - name: setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 8.1
           extensions: mbstring, mysqli, gd, zip
           ini-values: max_input_vars=5000
           coverage: pcov
@@ -41,8 +34,8 @@ jobs:
       - name: install Moodle
         run: moodle-plugin-ci install --db-user=root --db-pass=root --db-host=127.0.0.1 --plugin this-plugin
         env:
-          DB: ${{ matrix.database }}
-          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+          DB: 'mysqli'
+          MOODLE_BRANCH: 'MOODLE_403_STABLE'
 
       - name: phplint
         if: ${{ always() }}
