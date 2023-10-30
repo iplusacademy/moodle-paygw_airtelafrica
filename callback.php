@@ -48,7 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $eventargs = [
                     'context' => \context_course::instance($courseid),
                     'userid' => $payrec->userid,
-                    'other' => ['message' => $msg, 'id' => $tid, 'airtel_money_id' => $mid],
+                    'other' => [
+                        'message' => $msg,
+                        'id' => $transactionid,
+                        'airtel_money_id' => $mid,
+                    ],
                 ];
                 \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
                 $conf = \core_payment\helper::get_gateway_configuration(
