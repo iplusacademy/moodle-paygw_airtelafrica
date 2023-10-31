@@ -23,16 +23,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace paygw_airtelafrica\external;
 
 use core_payment\helper;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 use paygw_airtelafrica\airtel_helper;
-
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * This class collects information about a payment with the Airtel Africa payment gateway.
