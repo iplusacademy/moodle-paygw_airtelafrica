@@ -131,12 +131,6 @@ export const process = (component, paymentArea, itemId, description) => {
                                     },
                                     done: function(airtelPing) {
                                         console.log(el + '/10 ' + airtelPing.message);  // eslint-disable-line
-                                        if (airtelPing.message == 'Transaction Failed') {
-                                            cont = false;
-                                            const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
-                                            modal.setBody(a + airtelPing.message + '</div>');
-                                            modal.setFooter('Transaction with id '+ transId + ' failed');
-                                        }
                                         if (airtelPing.success == true) {
                                             spinnerDiv.attr('style', 'display: none;');
                                             cancelButton.attr('style', 'display: none;');
@@ -152,6 +146,12 @@ export const process = (component, paymentArea, itemId, description) => {
                                                 const loc = window.location.href;
                                                 window.location.replace(loc);
                                             });
+                                        }
+                                        if (airtelPing.message == 'Transaction Failed') {
+                                            cont = false;
+                                            const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
+                                            modal.setBody(a + airtelPing.message + '</div>');
+                                            modal.setFooter('Transaction with id '+ transId + ' failed');
                                         }
                                     },
                                     fail: function(e) {
