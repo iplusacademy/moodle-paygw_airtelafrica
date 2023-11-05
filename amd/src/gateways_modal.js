@@ -131,21 +131,19 @@ export const process = (component, paymentArea, itemId, description) => {
                                     },
                                     done: function(airtelPing) {
                                         console.log(el + '/10 ' + airtelPing.message);  // eslint-disable-line
-                                        if (airtelPing.success == true) {
-                                            spinnerDiv.attr('style', 'display: none;');
-                                            cancelButton.attr('style', 'display: none;');
-                                            const payButton1 = modal.getRoot().find('#airtel-pay');
-                                            payButton1.attr('disabled',  '');
-                                            modal.setFooter('Transaction with id '+ transId + ' succeeded');
+                                        if (airtelPing.message == 'Transaction Success') {
                                             cont = false;
-                                            const spinnerDiv = modal.getRoot().find('#airtel-spinner');
-                                            const a = '<br/><div class="p-3 mb-2 text-success font-weight-bold">';
-                                            const outDiv = modal.getRoot().find('#airtel-out');
-                                            outDiv.append(a + airtelPing.message + '</div>');
+                                            const payButton1 = modal.getRoot().find('#airtel-pay');
                                             payButton1.on('click', function() {
                                                 const loc = window.location.href;
                                                 window.location.replace(loc);
                                             });
+                                            modal.setFooter('Transaction with id '+ transId + ' succeeded');
+                                            const spinnerDiv = modal.getRoot().find('#airtel-spinner');
+                                            spinnerDiv.attr('style', 'display: none;');
+                                            const a = '<br/><div class="p-3 mb-2 text-success font-weight-bold">';
+                                            const outDiv = modal.getRoot().find('#airtel-out');
+                                            outDiv.append(a + airtelPing.message + '</div>');
                                         }
                                         if (airtelPing.message == 'Transaction Failed') {
                                             cont = false;

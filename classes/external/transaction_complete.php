@@ -74,7 +74,7 @@ class transaction_complete extends external_api {
         $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, 'airtelafrica');
         $helper = new airtel_helper($config);
         $trans = $helper->enrol_user($transactionid, $itemid, $component, $paymentarea);
-        return ['success' => ($trans == 'TS'), 'message' => airtel_helper::ta_code($trans)];
+        return ['success' => (bool)($trans == 'TS'), 'message' => airtel_helper::ta_code($trans)];
     }
 
     /**

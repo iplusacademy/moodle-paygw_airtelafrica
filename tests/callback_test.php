@@ -47,11 +47,28 @@ class callback_test extends \advanced_testcase {
      * @coversNothing
      */
     public function test_callback(): void {
+        global $DB;
+        $data = new \stdClass;
+        $data->paymentid = 140;
+        $data->userid = 13;
+        $data->transactionid = '4206315384';
+        $data->moneyid = null;
+        $data->timecreated = time();
+        $data->component = 'enrol_fee';
+        $data->paymentarea = 'fee';
+        $DB->insert_record('paygw_airtelafrica', $data);
         $client = new \GuzzleHttp\Client();
-        $authdata = ['client_id' => 'fakeclientid', 'client_secret' => 'fakesecret', 'grant_type' => 'client_credentials'];
+        $data = [
+            'transaction' => [
+                'id' => '4206315384',
+                'message' => 'Pseudo paid UGX 5,000 to MAUL',
+                'status_code' => 'TS',
+                'airtel_money_id' => 'MP210603.1234.L06941',
+            ],
+        ];
         $headers = ['Content-Type' => 'application/json'];
-        $url = 'https://test.medical-access.org/payment/gateway/airtelafrica/callback.php';
-        $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $authdata]);
+        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/callback.php';
+        $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $data]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
     }

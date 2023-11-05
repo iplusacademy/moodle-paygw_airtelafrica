@@ -9,7 +9,7 @@ Feature: Airtel Africa payment gateway test
       | username | phone2    | country |
       | student1 | 789012994 | UG      |
       | student2 | 666666666 | UG      |
-      | manager1 | 78901300  | UG      |
+      | manager1 | 789013004 | UG      |
     And the following "courses" exist:
       | fullname | shortname |
       | Course 1 | C1        |
@@ -32,9 +32,9 @@ Feature: Airtel Africa payment gateway test
       | Enrolment fee   | 5000             |
       | Currency        | Ugandan Shilling |
     And I add "Enrolment on payment" enrolment method in "Course 2" with:
-      | Payment account | Account1        |
-      | Enrolment fee   | 5000            |
-      | Currency        | Congolese Franc |
+      | Payment account | Account1         |
+      | Enrolment fee   | 5000             |
+      | Currency        | Ugandan Shilling |
     And I log out
 
   @javascript
@@ -80,12 +80,10 @@ Feature: Airtel Africa payment gateway test
     When I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
     And I should see "5,000"
-    And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should not see "789012"
+    And I should see "6666666"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
-    And I wait until the page is ready
     And I should see "succeeded"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
     And I wait until the page is ready

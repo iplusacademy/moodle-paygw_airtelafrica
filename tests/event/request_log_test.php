@@ -40,6 +40,7 @@ class request_log_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\event\request_log
      */
     public function test_gateway(): void {
+        global $DB;
         $this->resetAfterTest();
         $eventarray = [
             'context' => \context_system::instance(),
@@ -49,9 +50,19 @@ class request_log_test extends \advanced_testcase {
                 'transaction' => ['id' => 'fakeid'],
             ],
         ];
+        $sink = $this->redirectEvents();
         $event = request_log::create($eventarray);
         $event->trigger();
-        $event->get_name();
-        $event->get_description();
+        $this->assertEquals('Gateway log', $event->get_name());
+        $this->assertEquals('token  : faketoken <br />transaction  : {"id":"fakeid"} <br />', $event->get_description());
+
+        $this->assertCount(0, $DB->get_records('logstore_standard_log'));
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertInstanceOf('\paygw_airtelafrica\event\request_log', $event);
+        $this->assertEquals(\context_system::instance(), $event->get_context());
+        $this->assertEquals(2, $event->relateduserid);
+        $sink->close();
     }
 }

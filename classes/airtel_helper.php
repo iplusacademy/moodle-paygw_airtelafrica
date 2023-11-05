@@ -81,15 +81,12 @@ class airtel_helper {
      * @param string $country Airtel Africa location.
      */
     public function __construct(array $config, string $country = 'UG') {
-        $this->sandbox = (bool)strtolower($config['environment']) == 'sandbox';
+        $this->sandbox = strtolower($config['environment']) == 'sandbox';
         $this->clientid = $config[$this->sandbox ? 'clientidsb' : 'clientid'];
         $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
         $this->airtelurl = $this::get_baseurl();
         $this->country = array_key_exists('country', $config) ? $config['country'] : $country;
         $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
-        if ($this->testing) {
-            $this->sandbox = true;
-        }
     }
 
     /**
@@ -107,7 +104,7 @@ class airtel_helper {
      * @return string
      */
     private function get_base(): string {
-        return $this->sandbox ? 'sandbox' : 'production';
+        return $this->sandbox ? 'sandbox' : 'live';
     }
 
     /**
@@ -119,7 +116,7 @@ class airtel_helper {
      * @return bool
      */
     private function is_testing(string $id): bool {
-        return defined('BEHAT_SITE_RUNNING') ? $id == '666666666' : $this->testing && $id == '666666666';
+        return $this->sandbox && ($id == '666666666');
     }
 
     /**
@@ -273,9 +270,10 @@ class airtel_helper {
                 'context' => \context_system::instance(),
                 'other' => [
                     'verb' => $verb,
-                    'location' => $this->get_base() . ':' . $location,
+                    $this->get_base() => $location,
                     'token' => $this->token,
                     'result' => $decoded,
+                    'testing' => $this->testing ? 'true' : 'false',
                 ],
             ];
             $event = \paygw_airtelafrica\event\request_log::create($eventargs);

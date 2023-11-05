@@ -240,5 +240,10 @@ class airtel_helper_test extends \advanced_testcase {
         $class = new \ReflectionClass('\\paygw_airtelafrica\\airtel_helper');
         $this->assertCount(14, $class->getMethods());
         $this->assertCount(7, $class->getProperties());
+
+        $config = ['environment' => 'live', 'clientid' => getenv('login'), 'secret' => getenv('secret')];
+        $helper = new airtel_helper($config);
+        $return = \phpunit_util::call_internal_method($helper, 'get_base', [], $name);
+        $this->assertEquals('live', $return);
     }
 }

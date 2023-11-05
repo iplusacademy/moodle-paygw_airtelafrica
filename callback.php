@@ -39,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $response);
         if ($transaction) {
             $transactionid = \paygw_airtelafrica\airtel_helper::array_helper('id', $transaction) ?? '';
+            $succes = \paygw_airtelafrica\airtel_helper::array_helper('status_code', $transaction) ?? 'TF';
             $cond = ['transactionid' => $transactionid];
-            if ($transactionid != '' && $DB->record_exists($table, $cond)) {
+            if ($succes == 'TS' && $transactionid != '' && $DB->record_exists($table, $cond)) {
                 $payrec = $DB->get_record($table, $cond);
                 $msg = \paygw_airtelafrica\airtel_helper::array_helper('message', $transaction) ?? 'Unknown';
                 $mid = \paygw_airtelafrica\airtel_helper::array_helper('airtel_money_id', $transaction) ?? '';
@@ -50,51 +51,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'userid' => $payrec->userid,
                     'other' => [
                         'message' => $msg,
+                        'paymentid' => $payrec->paymentid,
                         'id' => $transactionid,
                         'airtel_money_id' => $mid,
                     ],
                 ];
-                \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
                 $conf = \core_payment\helper::get_gateway_configuration(
                     $payrec->component,
                     $payrec->paymentarea,
                     $payrec->paymentid,
                     $gateway);
                 $helper = new \paygw_airtelafrica\airtel_helper($conf);
-                $payable = \core_payment\helper::get_payable($payrec->component, $payrec->paymentarea, $payrec->paymentid);
-                $currency = $payable->get_currency();
-                $result = $helper->transaction_enquiry($transactionid, $currency);
-                $status = \paygw_airtelafrica\airtel_helper::array_helper('status', $result);
-                $data = \paygw_airtelafrica\airtel_helper::array_helper('data', $result);
-                if ($status && $data && $status['code'] == '200' && $status['success']) {
-                    $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $data);
-                    if ($transaction && $transaction['status'] == 'TS') {
-                        $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
-                        $amount = (int)\core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
-                        $DB->set_field('paygw_airtelafrica', 'timecompleted', time(), $cond);
-                        $DB->set_field('paygw_airtelafrica', 'moneyid', $mid, $cond);
-                        try {
-                            $paymentid = \core_payment\helper::save_payment(
-                                $payable->get_account_id(),
-                                $payrec->component,
-                                $payrec->paymentarea,
-                                $transactionid,
-                                $payrec->userid,
-                                $amount,
-                                $currency,
-                                $gateway);
-                            \core_payment\helper::deliver_order(
-                                $payrec->component,
-                                $payrec->paymentarea,
-                                $transactionid,
-                                $paymentid,
-                                $payrec->userid);
-                        } catch (Exception $e) {
-                            die($e->getMessage());
-                        }
-                    }
-                }
+                $helper->enrol_user($transactionid, $payrec->paymentid, $payrec->component, $payrec->paymentarea);
+            } else {
+                $eventargs = [
+                    'context' => \context_system::instance(),
+                    'userid' => 2,
+                    'other' => $transaction,
+                ];
             }
+            \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
         }
     }
 }

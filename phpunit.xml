@@ -50,9 +50,9 @@
       <directory suffix=".php">db</directory>
       <directory suffix=".php">lang</directory>
       <directory suffix=".php">tests/behat</directory>
+      <file>callback.php</file>
       <file>version.php</file>
       <file>settings.php</file>
-      <file>callback.php</file>
     </exclude>
   </coverage>
 

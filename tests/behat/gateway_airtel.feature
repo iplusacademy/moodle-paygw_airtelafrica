@@ -6,7 +6,7 @@ Feature: Airtel Africa payment gateway
 
   Background:
     Given the following "users" exist:
-      | username | phone2   | country |
+      | username | phone    | country |
       | student1 | 78901299 | UG      |
       | student2 | 66666666 | UG      |
       | manager1 | 78901300 | UG      |
@@ -34,11 +34,13 @@ Feature: Airtel Africa payment gateway
     And I should see "Secret"
     And I should see "Environment"
     And I set the following fields to these values:
-      | Brand name    | Test brand  |
-      | Client ID     | Test_id     |
-      | Secret        | Test_Secret |
-      | Environment   | Sandbox     |
-      | Country       | Uganda      |
+      | Brand name         | Test brand  |
+      | Client ID          | Test_id     |
+      | Secret             | Test_Secret |
+      | Sandbox Client ID  | Test_id     |
+      | Sandbox secret     | Test_Secret |
+      | Environment        | Sandbox     |
+      | Country            | Uganda      |
     And I press "Save changes"
     And I log out
     And I log in as "manager1"
