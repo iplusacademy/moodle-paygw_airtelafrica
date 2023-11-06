@@ -301,6 +301,12 @@ class airtel_helper {
         $cond = ['transactionid' => $transactionid, 'paymentid' => $itemid];
         if ($rec = $DB->get_record('paygw_airtelafrica', $cond)) {
             if ($rec->timecompleted == 0) {
+                // If user is already enrolled?
+                $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $rec->paymentarea, 'id' => $rec->paymentid]);
+                $context = \context_course::instance($courseid);
+                if (is_enrolled($context, $rec->userid, '', true)) {
+                    return 'TS';
+                }
                 $this->token = $rec->moneyid;
                 $payable = helper::get_payable($component, $area, $itemid);
                 $currency = $payable->get_currency();

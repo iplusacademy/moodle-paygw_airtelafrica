@@ -1,4 +1,4 @@
-@paygw @paygw_airtelafrica
+@paygw @paygw_airtelafrica @secrets
 Feature: Airtel Africa payment gateway test
 
   In order to control student access to courses

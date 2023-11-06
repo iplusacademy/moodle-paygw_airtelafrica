@@ -1,4 +1,4 @@
-@paygw @paygw_airtelafrica
+@paygw @paygw_airtelafrica @secrets
 Feature: Airtel Africa payment gateway
 
   In order to control student access to courses
@@ -6,7 +6,7 @@ Feature: Airtel Africa payment gateway
 
   Background:
     Given the following "users" exist:
-      | username | phone    | country |
+      | username | phone2   | country |
       | student1 | 78901299 | UG      |
       | student2 | 66666666 | UG      |
       | manager1 | 78901300 | UG      |
@@ -25,39 +25,15 @@ Feature: Airtel Africa payment gateway
       | name           | gateways     |
       | Account1       | airtelafrica |
     And I log in as "admin"
-    And I navigate to "Plugins > Enrolments > Manage enrol plugins" in site administration
-    And I click on "Enable" "link" in the "Enrolment on payment" "table_row"
-    And I navigate to "Payments > Payment accounts" in site administration
-    And I click on "Airtel Africa" "link" in the "Account1" "table_row"
-    Then I should see "Brand name"
-    And I should see "Client ID"
-    And I should see "Secret"
-    And I should see "Environment"
-    And I set the following fields to these values:
-      | Brand name         | Test brand  |
-      | Client ID          | Test_id     |
-      | Secret             | Test_Secret |
-      | Sandbox Client ID  | Test_id     |
-      | Sandbox secret     | Test_Secret |
-      | Environment        | Sandbox     |
-      | Country            | Uganda      |
-    And I press "Save changes"
-    And I log out
-    And I log in as "manager1"
-    And I am on the "Course 1" "enrolment methods" page
-    And I select "Enrolment on payment" from the "Add method" singleselect
-    And I set the following fields to these values:
+    And I configure airtel
+    And I add "Enrolment on payment" enrolment method in "Course 1" with:
       | Payment account | Account1        |
       | Enrolment fee   | 123.45          |
       | Currency        | Ugandan Shilling |
-    And I press "Add method"
-    And I am on the "Course 2" "enrolment methods" page
-    And I select "Enrolment on payment" from the "Add method" singleselect
-    And I set the following fields to these values:
+    And I add "Enrolment on payment" enrolment method in "Course 2" with:
       | Payment account | Account1         |
       | Enrolment fee   | 123.45           |
       | Currency        | Congolese Franc |
-    And I press "Add method"
     And I log out
 
   @javascript
@@ -103,7 +79,7 @@ Feature: Airtel Africa payment gateway
     And I should see "66666666"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "Airtel Africa" "dialogue"
-    And I should see "FAILED"
+    And I should see "failed"
 
   Scenario: Guest can see the login prompt on the Airtel Africa course enrolment page with round price
     When I log in as "guest"
