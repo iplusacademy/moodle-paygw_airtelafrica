@@ -38,9 +38,7 @@ To set up access within Moodle you will need to:
 
 ## Requirements
 
-- This plugin requires Moodle 4.1.0+
-- Currently this plugin is using the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
-- From Moodle_402_STABLE on this dependency will not be necessary any more as Guzzle will be part of Moodle.
+- This plugin requires Moodle 4.2.0+
 
 ## Configure Moodle
 
@@ -60,8 +58,8 @@ To set up access within Moodle you will need to:
 - Select a payment account, amend the enrolment fee as necessary then click the button 'Add method'.
 
 see also:  
-[moodledocs: Payment Gateways](https://docs.moodle.org/en/Payment_gateways)  
-[moodledocs: Enrolment on Payment](https://docs.moodle.org/en/Enrolment_on_payment)
+[moodledocs: Payment gateways](https://docs.moodle.org/en/Payment_gateways)  
+[moodledocs: Enrolment on payment](https://docs.moodle.org/en/Enrolment_on_payment)
 
 ## Theme support
 
