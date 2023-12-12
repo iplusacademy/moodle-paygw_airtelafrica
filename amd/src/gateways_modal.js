@@ -138,6 +138,7 @@ export const process = (component, paymentArea, itemId, description) => {
                                                 const loc = window.location.href;
                                                 window.location.replace(loc);
                                             });
+                                            progressDiv.attr('value', 100);
                                             modal.setFooter('Transaction with id '+ transId + ' succeeded');
                                             const spinnerDiv = modal.getRoot().find('#airtel-spinner');
                                             spinnerDiv.attr('style', 'display: none;');

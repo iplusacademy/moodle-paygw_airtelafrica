@@ -18,7 +18,7 @@
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda Limited
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ use curl;
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda
+ * @copyright  2023 Medical Access Uganda Limited
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
