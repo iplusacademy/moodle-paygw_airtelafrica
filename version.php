@@ -27,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->requires = 2023042400;
 $plugin->component = 'paygw_airtelafrica';
-$plugin->maturity = MATURITY_RC;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
 $plugin->supported = [402, 403];
-$plugin->release = 'v4.2.4';
-$plugin->version = 2023110600;
+$plugin->release = 'v4.2.5';
+$plugin->version = 2024011400;
 
