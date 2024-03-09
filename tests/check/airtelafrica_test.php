@@ -33,7 +33,7 @@ namespace paygw_airtelafrica\check;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class airtelafrica_test extends \advanced_testcase {
+final class airtelafrica_test extends \advanced_testcase {
 
     /**
      * Test checks.
