@@ -29,6 +29,6 @@ $plugin->requires = 2023042400;
 $plugin->component = 'paygw_airtelafrica';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 403];
+$plugin->supported = [402, 404];
 $plugin->release = 'v4.2.7';
 $plugin->version = 2024031000;

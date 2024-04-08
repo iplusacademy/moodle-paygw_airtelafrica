@@ -70,7 +70,7 @@ class airtel_helper {
     public $token;
 
     /**
-     * @var boolean testing
+     * @var bool testing
      */
     public $testing;
 
@@ -354,8 +354,8 @@ class airtel_helper {
             'ESB000001' => 'Something went wrong.',
             'ESB000004' => 'An error occurred while initiating the payment.',
             'ESB000008' => 'Field validation.',
-            'ESB000011' => 'Transaction failed.',
             'ESB000010' => 'Your transaction has been successfully processed.',
+            'ESB000011' => 'Transaction failed.',
             'ESB000014' => 'An error occurred while fetching the transaction status.',
             'ESB000033' => 'Invalid MSISDN Length. MSISDN Length should be ',
             'ESB000034' => 'Invalid Country Name.',
