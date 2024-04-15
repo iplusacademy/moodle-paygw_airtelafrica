@@ -32,7 +32,6 @@ $functions = [
         'description' => 'Returns the configuration settings',
         'type' => 'read',
         'ajax' => true,
-        'loginrequired' => true,
     ],
     'paygw_airtelafrica_transaction_start' => [
         'classname' => \paygw_airtelafrica\external\transaction_start::class,
@@ -40,7 +39,6 @@ $functions = [
         'description' => 'Returns a new transaction id',
         'type' => 'write',
         'ajax' => true,
-        'loginrequired' => true,
     ],
     'paygw_airtelafrica_transaction_complete' => [
         'classname' => \paygw_airtelafrica\external\transaction_complete::class,
@@ -48,6 +46,5 @@ $functions = [
         'description' => 'Finalise a Airtel Africa payment',
         'type' => 'write',
         'ajax' => true,
-        'loginrequired' => true,
     ],
 ];
