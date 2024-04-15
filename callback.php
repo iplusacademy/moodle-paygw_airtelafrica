@@ -28,12 +28,12 @@ define('NO_DEBUG_DISPLAY', true);
 // @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../config.php');
 
-global $CFG, $DB;
-require_once($CFG->dirroot . '/course/lib.php');
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    http_response_code(405);
+} else {
     // Handles callbacks done by Airtel Africa.
     if ($response = json_decode(file_get_contents('php://input'), true)) {
+        // Sample data>
         $gateway = 'airtelafrica';
         $table = 'paygw_airtelafrica';
         $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $response);
