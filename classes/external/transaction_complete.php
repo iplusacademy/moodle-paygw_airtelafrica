@@ -18,7 +18,7 @@
  * This class completes a payment with the Airtel Africa payment gateway.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace paygw_airtelafrica\external;
 
+use context_system;
+use context_user;
 use core_payment\helper;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 use paygw_airtelafrica\airtel_helper;
@@ -34,12 +36,11 @@ use paygw_airtelafrica\airtel_helper;
  * This class completes a payment with the Airtel Africa payment gateway.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class transaction_complete extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -65,6 +66,11 @@ class transaction_complete extends external_api {
      * @return array
      */
     public static function execute(string $component, string $paymentarea, int $itemid, string $transactionid): array {
+        global $USER;
+        $usercontext = context_user::instance($USER->id);
+        self::validate_context($usercontext);
+        $systencontext = context_system::instance();
+        self::validate_context($systencontext);
         self::validate_parameters(self::execute_parameters(), [
             'component' => $component,
             'paymentarea' => $paymentarea,

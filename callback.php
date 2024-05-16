@@ -18,7 +18,7 @@
  * Handles callback received from Airtel Africa
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                     $payrec->component,
                     $payrec->paymentarea,
                     $payrec->paymentid,
-                    $gateway);
+                    $gateway
+                );
                 $helper = new \paygw_airtelafrica\airtel_helper($conf);
                 $helper->enrol_user($transactionid, $payrec->paymentid, $payrec->component, $payrec->paymentarea);
             } else {

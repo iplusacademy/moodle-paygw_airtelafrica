@@ -18,7 +18,7 @@
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,13 +29,11 @@ namespace paygw_airtelafrica;
  * Testing generator in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class airtel_helper_test extends \advanced_testcase {
-
-
     /** @var config configuration */
     private $config;
 
@@ -62,6 +60,19 @@ final class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
         $this->assertEquals('Transaction Success', airtel_helper::ta_code('TS'));
         $this->assertEquals('In process', airtel_helper::dp_code('DP00800001006'));
+
+        $this->assertEquals(null, airtel_helper::array_helper('BE', ['FR' => 'France']));
+        $this->assertEquals('Belgium', airtel_helper::array_helper('BE', ['BE' => 'Belgium']));
+        $arr = ['FR' => 'France', 'BE' => 'Belgium'];
+        $this->assertEquals(null, airtel_helper::array_helper('BE', ['countries' => $arr]));
+        $this->assertEquals($arr, airtel_helper::array_helper('countries', ['countries' => $arr]));
+
+        $key = 'user<script>alert(1);</script>xss';
+        $obj = (object)['name' => $key, $key => 'heslo', 'email' => 'xssuser@example.com'];
+        $arr = (array)$obj;
+        $this->assertEquals(null, airtel_helper::array_helper('name', ['countries' => $arr]));
+        $this->assertEquals(null, airtel_helper::array_helper($key, ['countries' => $arr]));
+        $this->assertEquals('me', airtel_helper::array_helper('name', ['name' => 'me', $key => $arr]));
         $random = random_int(1000000000, 9999999999);
         try {
             $helper->request_payment($random, "tst5_course_$random", 1000, 'UGX', '666666666', 'BE');
@@ -104,7 +115,9 @@ final class airtel_helper_test extends \advanced_testcase {
             $this->markTestSkipped('No login credentials');
         }
         $random = random_int(1000000000, 9999999999);
-        $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $user = $generator->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
         $helper = new airtel_helper($this->config);
         $result = $helper->request_payment($random, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
@@ -114,6 +127,8 @@ final class airtel_helper_test extends \advanced_testcase {
             $transactionid = $result['data']['transaction']['id'];
             $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
         }
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
     }
 
     /**

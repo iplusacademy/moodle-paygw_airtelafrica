@@ -18,7 +18,7 @@
  * Privacy Subsystem implementation for paygw_airtelafrica.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,14 +34,15 @@ use core_privacy\local\metadata\collection;
  * Privacy Subsystem implementation for paygw_airtelafrica.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider,
-                          \core_privacy\local\request\plugin\provider,
-                          core_userlist_provider,
-                          paygw_provider {
+class provider implements 
+    core_userlist_provider,
+    paygw_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
 
     /**
      * Returns meta data about this system.
@@ -153,7 +154,7 @@ class provider implements \core_privacy\local\metadata\provider,
         global $DB;
         $context = $userlist->get_context();
         if (is_a($context, \context_user::class)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+            [$insql, $inparams] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
             $DB->delete_records_select('paygw_airtelafrica', "userid $insql", $inparams);
         }
     }

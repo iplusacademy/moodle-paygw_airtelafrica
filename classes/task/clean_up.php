@@ -18,7 +18,7 @@
  * Clean up task for the airtel payment gateway plugin.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,6 @@ namespace paygw_airtelafrica\task;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class clean_up extends \core\task\scheduled_task {
-
     /**
      * Name for this task.
      *
@@ -49,4 +48,3 @@ class clean_up extends \core\task\scheduled_task {
         $DB->delete_records_select('paygw_airtelafrica', 'timecompleted = :cond', ['cond' => null]);
     }
 }
-

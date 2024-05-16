@@ -18,7 +18,7 @@
  * Testing callback in Airtel Africa payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,12 +29,11 @@ namespace paygw_airtelafrica;
  * Testing callback in Airtel Africa payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class callback_test extends \advanced_testcase {
-
     /**
      * Setup function.
      */
@@ -48,7 +47,7 @@ final class callback_test extends \advanced_testcase {
      */
     public function test_callback(): void {
         global $DB;
-        $data = new \stdClass;
+        $data = new \stdClass();
         $data->paymentid = 140;
         $data->userid = 13;
         $data->transactionid = '4206315384';

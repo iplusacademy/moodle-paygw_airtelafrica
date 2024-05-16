@@ -18,7 +18,7 @@
  * Contains class for Airtel Africa payment gateway.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,12 +29,11 @@ namespace paygw_airtelafrica;
  * The gateway class for Airtel Africa payment gateway.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gateway extends \core_payment\gateway {
-
     /**
      * Currencies supported
      *
@@ -122,7 +121,11 @@ class gateway extends \core_payment\gateway {
      * @param array $errors form errors (passed by reference)
      */
     public static function validate_gateway_form(
-        \core_payment\form\account_gateway $form, \stdClass $data, array $files, array &$errors): void {
+        \core_payment\form\account_gateway $form,
+        \stdClass $data,
+        array $files,
+        array &$errors
+    ): void {
         if ($data->enabled) {
             if (empty($data->clientid) || empty($data->secret) || empty($data->clientidsb) || empty($data->secretsb)) {
                 $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');

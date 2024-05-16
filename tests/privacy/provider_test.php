@@ -18,7 +18,7 @@
  * Privacy provider tests.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,12 +38,11 @@ use stdClass;
  * Privacy provider test for payment gateway airtelafrica.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class provider_test extends provider_testcase {
-
     /** @var stdClass A student. */
     protected $user;
 
@@ -61,7 +60,8 @@ final class provider_test extends provider_testcase {
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
         $this->user = $generator->create_user();
         $id = $generator->get_plugin_generator('core_payment')->create_payment(
-            ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'airtelafrica', 'userid' => $this->user->id]);
+            ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'airtelafrica', 'userid' => $this->user->id]
+        );
         $data = new stdClass();
         $data->paymentid = $id;
         $data->userid = $this->user->id;

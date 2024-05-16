@@ -18,7 +18,7 @@
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,12 +33,11 @@ use curl;
  * Contains helper class to work with Airtel Africa REST API.
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class airtel_helper {
-
     /**
      * @var string The base API URL
      */
@@ -131,7 +130,13 @@ class airtel_helper {
      * @return array Formatted API response.
      */
     public function request_payment(
-        int $transactionid, string $reference, float $amount, string $currency, string $userphone, string $usercountry): array {
+        int $transactionid,
+        string $reference,
+        float $amount,
+        string $currency,
+        string $userphone,
+        string $usercountry
+    ): array {
         if ($this->is_testing($userphone)) {
             $result = [
                 'data' => [
@@ -248,10 +253,12 @@ class airtel_helper {
                 $response = $client->request(
                     'POST',
                     $this->airtelurl . 'auth/oauth2/token',
-                    ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]);
+                    ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]
+                );
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\Exception $e) {
+                mtrace($result);
                 mtrace_exception($e);
                 return [];
             }
@@ -332,7 +339,8 @@ class airtel_helper {
                                 $rec->userid,
                                 $amount,
                                 $currency,
-                                'airtelafrica');
+                                'airtelafrica'
+                            );
                             helper::deliver_order($component, $area, $itemid, $saved, $rec->userid);
                             $DB->set_field('paygw_airtelafrica', 'timecompleted', time(), $cond);
                             $DB->set_field('paygw_airtelafrica', 'moneyid', $moneyid, $cond);
@@ -365,7 +373,7 @@ class airtel_helper {
             'ESB000041' => 'External transaction ID already exists.',
             'ESB000045' => 'No transaction found with provided transaction Id.',
         ];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
+        return self::array_helper($code, $returns) ?? '';
     }
 
     /**
@@ -380,7 +388,7 @@ class airtel_helper {
             'TA' => 'Transaction Ambiguous',
             'TIP' => 'Transaction in Progress',
         ];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
+        return self::array_helper($code, $returns) ?? '';
     }
 
     /**
@@ -407,7 +415,7 @@ class airtel_helper {
             'DP00800001025' => 'Transaction not found',
             'DP00800001029' => 'Transaction expired',
         ];
-        return array_key_exists($code, $returns) ? $returns[$code] : '';
+        return self::array_helper($code, $returns) ?? '';
     }
 
     /**
@@ -418,7 +426,14 @@ class airtel_helper {
      * @return array||bool
      */
     public static function array_helper(string $key, array $arr) {
-        return (array_key_exists($key, $arr)) ? $arr[$key] : false;
+        return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : false;
+        // Cleans key and array to avoid XSS and other issues.
+        $safekey = clean_param($key, PARAM_TEXT);
+        $safearr = clean_param_array($arr, PARAM_TEXT, true);
+        if (is_array($safearr) && isset($safearr[$safekey]) && !empty($safearr[$safekey])) {
+            return $safearr[$safekey];
+        }
+        return false;
     }
 
     /**

@@ -18,7 +18,7 @@
  * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,13 +31,12 @@ use core_external;
  * Testing externals in payments API
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
 final class external_test extends \advanced_testcase {
-
     /** @var config configuration */
     private $config;
 
@@ -204,7 +203,7 @@ final class external_test extends \advanced_testcase {
         $this->assertEquals($CFG->wwwroot . '/course/view.php?id=' . $course->id, $successurl->out(false));
         $account = new \core_payment\account($payable->get_account_id());
 
-        \enrol_fee\payment\service_provider::deliver_order('fee',  $this->feeid, $paymentid, $user->id);
+        \enrol_fee\payment\service_provider::deliver_order('fee', $this->feeid, $paymentid, $user->id);
         $context = \context_course::instance($course->id);
         $this->assertTrue(is_enrolled($context, $user));
         $this->assertTrue(user_has_role_assignment($user->id, 5, $context->id));

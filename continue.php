@@ -18,7 +18,7 @@
  * Handles callback received from Airtel Africa
  *
  * @package    paygw_airtelafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,4 +36,3 @@ if ($courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $paymentarea, 'i
     $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
 }
 redirect($url);
-
