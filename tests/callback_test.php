@@ -38,6 +38,7 @@ final class callback_test extends \advanced_testcase {
      * Setup function.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
     }
 

@@ -44,6 +44,7 @@ final class airtel_helper_test extends \advanced_testcase {
      * Setup function- we will create a course and add an assign instance to it.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
         set_config('country', 'UG');
         $this->config = ['environment' => 'sandbox', 'clientidsb' => getenv('login'), 'secretsb' => getenv('secret')];

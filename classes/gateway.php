@@ -87,18 +87,22 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('text', 'clientid', $strs->clientid);
         $mform->setType('clientid', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('clientid', 'clientid', $txt);
+        $mform->addRule('clientid', get_string('required'), 'required', null, 'client');
 
         $mform->addElement('passwordunmask', 'secret', $strs->secret);
         $mform->setType('secret', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('secret', 'secret', $txt);
+        $mform->addRule('secret', get_string('required'), 'required', null, 'client');
 
         $mform->addElement('text', 'clientidsb', $strs->clientidsb);
         $mform->setType('clientidsb', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('clientidsb', 'clientidsb', $txt);
+        $mform->addRule('clientidsb', get_string('required'), 'required', null, 'client');
 
         $mform->addElement('passwordunmask', 'secretsb', $strs->secretsb);
         $mform->setType('secretsb', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('secretsb', 'secretsb', $txt);
+        $mform->addRule('secretsb', get_string('required'), 'required', null, 'client');
 
         $options = self::get_supported_countries();
         $mform->addElement('select', 'country', $strs->country, $options, 'UG');
@@ -108,8 +112,6 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('select', 'environment', $strs->environment, $options);
         $mform->addHelpButton('environment', 'environment', $txt);
 
-        $mform->addRule('clientid', get_string('required'), 'required', null, 'client');
-        $mform->addRule('secret', get_string('required'), 'required', null, 'client');
     }
 
     /**
@@ -126,10 +128,9 @@ class gateway extends \core_payment\gateway {
         array $files,
         array &$errors
     ): void {
-        if ($data->enabled) {
-            if (empty($data->clientid) || empty($data->secret) || empty($data->clientidsb) || empty($data->secretsb)) {
-                $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');
-            }
+        $vals = empty($data->clientid) || empty($data->secret) || empty($data->clientidsb) || empty($data->secretsb);
+        if ($data->enabled && $vals) {
+            $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');
         }
     }
 }

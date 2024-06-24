@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 } else {
     // Handles callbacks done by Airtel Africa.
     if ($response = json_decode(file_get_contents('php://input'), true)) {
-        // Sample data>
+        // Sample data.
         $gateway = 'airtelafrica';
         $table = 'paygw_airtelafrica';
         $transaction = \paygw_airtelafrica\airtel_helper::array_helper('transaction', $response);

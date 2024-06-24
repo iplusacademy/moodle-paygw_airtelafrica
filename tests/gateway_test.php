@@ -41,6 +41,7 @@ final class gateway_test extends \advanced_testcase {
      * Setup function.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
         set_config('country', 'UG');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
@@ -52,7 +53,14 @@ final class gateway_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\gateway
      */
     public function test_gateway(): void {
+        $out = ['UGX', 'NGN', 'TZS', 'KES', 'RWF', 'XOF', 'XAF', 'CDF', 'USD', 'XAF', 'SCR', 'MGA', 'MWK', 'ZMW'];
         $this->assertCount(14, gateway::get_supported_currencies());
+        $this->assertEquals($out, gateway::get_supported_currencies());
+
+        $out = ['CD', 'CG', 'GA', 'GH', 'KE', 'LR', 'MG', 'MW', 'NE', 'NG', 'RW', 'SC', 'TD', 'TZ', 'UG', 'ZA'];
+        $this->assertCount(16, gateway::get_countries());
+        $this->assertEquals($out, gateway::get_countries());
+
         $errors = [];
         $gateway = $this->account->get_gateways()['airtelafrica'];
         $form = new \core_payment\form\account_gateway('', ['persistent' => $gateway]);
@@ -60,6 +68,47 @@ final class gateway_test extends \advanced_testcase {
         $data->enabled = true;
         gateway::validate_gateway_form($form, $data, [], $errors);
         $this->assertCount(1, $errors);
+        $this->assertEquals($errors,
+            [
+                'enabled' => 'The payment gateway cannot be enabled because the configuration is incomplete.',
+            ]
+        );
+
+        $errors = [];
+        $data->clientid = 'clientid  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(1, $errors);
+
+        $errors = [];
+        $data->secret = 'secret  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(1, $errors);
+
+        $errors = [];
+        $data->enabled = false;
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(0, $errors);
+
+        $out = $form->render();
+        $out1 = preg_replace('/\s\s+/', '', $out);
+        $out1 = str_ireplace("\n", '', $out1);
+        $this->assertStringContainsString('id="id_clientid"value=""aria-required="true"', $out1);
+        $this->assertStringContainsString(
+            'id="id_secret"value=""class="form-control d-none "data-size=""aria-required="true"',
+            $out1
+        );
+        $this->assertStringContainsString(
+            '<option value="live">Live</option><option value="sandbox">Sandbox</option>',
+            $out1
+        );
+        $this->assertStringContainsString('Uganda', $out);
+        $this->assertStringContainsString('Required', $out);
+        $this->assertStringContainsString('Help with Brand name', $out);
+        $this->assertStringContainsString('Help with Country', $out);
+        $this->assertStringContainsString('Help with Client ID', $out);
+        $this->assertStringContainsString('Help with Secret', $out);
+        $this->assertStringContainsString('Help with Sandbox Client', $out);
+
     }
 
     /**

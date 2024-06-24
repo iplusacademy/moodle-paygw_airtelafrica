@@ -26,6 +26,7 @@
 namespace paygw_airtelafrica\external;
 
 use core_external;
+use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 
 /**
  * Testing externals in payments API
@@ -52,6 +53,7 @@ final class external_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
         $this->resetAfterTest(true);
         $this->phone = getenv('phone') ? getenv('phone') : '666666666';
         $generator = $this->getDataGenerator();
@@ -80,6 +82,30 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_config_for_js(): void {
+        $out = get_config_for_js::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'Component'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'An identifier for payment area in the component'),
+        ]);
+        $this->assertInstanceOf('\core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = get_config_for_js::execute_returns();
+        $in = new external_single_structure([
+            'clientid' => new external_value(PARAM_TEXT, 'Airtel Africa client ID'),
+            'brandname' => new external_value(PARAM_TEXT, 'Brand name'),
+            'country' => new external_value(PARAM_TEXT, 'Client country'),
+            'cost' => new external_value(PARAM_FLOAT, 'Amount (with surcharge) that will be debited from the payer account.'),
+            'currency' => new external_value(PARAM_TEXT, 'ISO4217 Currency code'),
+            'phone' => new external_value(PARAM_TEXT, 'User mobile phone'),
+            'usercountry' => new external_value(PARAM_TEXT, 'User country'),
+            'timeout' => new external_value(PARAM_INT, 'Timout'),
+            'reference' => new external_value(PARAM_TEXT, 'Reference'),
+        ]);
+        $this->assertInstanceOf('\core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
+
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertEquals('UG', $result['country']);
     }
@@ -89,6 +115,25 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_start
      */
     public function test_transaction_start(): void {
+        $out = transaction_start::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'The component name'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
+        ]);
+        $this->assertInstanceOf('core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = transaction_start::execute_returns();
+        $in = new external_function_parameters([
+            'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
+            'reference' => new external_value(PARAM_RAW, 'A reference'),
+            'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
+        ]);
+
+        $this->assertInstanceOf('core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
+
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertArrayHasKey('message', $result);
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
@@ -102,6 +147,24 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete(): void {
+        $out = transaction_complete::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'The component name'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
+            'transactionid' => new external_value(PARAM_TEXT, 'The transaction id coming back from Airtel Africa'),
+        ]);
+        $this->assertInstanceOf('core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = transaction_complete::execute_returns();
+        $in = new external_function_parameters([
+            'success' => new external_value(PARAM_BOOL, 'Whether everything was successful or not.'),
+            'message' => new external_value(PARAM_RAW, 'Message (usually the error message).'),
+        ]);
+        $this->assertInstanceOf('core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
+
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
         $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, '666666666');
         $this->assertArrayHasKey('success', $result);

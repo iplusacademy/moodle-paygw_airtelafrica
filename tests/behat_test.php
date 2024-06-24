@@ -40,6 +40,7 @@ final class behat_test extends \advanced_testcase {
     protected function setUp(): void {
         global $CFG;
         require_once($CFG->dirroot . '/payment/gateway/airtelafrica/tests/behat/behat_paygw_airtelafrica.php');
+        parent::setUp();
         $this->resetAfterTest(true);
     }
 

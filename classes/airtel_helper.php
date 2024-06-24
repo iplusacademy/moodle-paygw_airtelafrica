@@ -138,7 +138,7 @@ class airtel_helper {
         string $usercountry
     ): array {
         if ($this->is_testing($userphone)) {
-            $result = [
+            return [
                 'data' => [
                     'transaction' => [
                         'id' => '666666666',
@@ -171,7 +171,7 @@ class airtel_helper {
                 'id' => $transactionid,
             ],
         ];
-        return $this->is_testing($userphone) ? $result : $this->request_post($location, $data, $headers);
+        return $this->request_post($location, $data, $headers);
     }
 
     /**
@@ -183,7 +183,7 @@ class airtel_helper {
      */
     public function make_refund(string $airtelmoneyid, string $currency): array {
         if ($this->is_testing($airtelmoneyid)) {
-            $result = [
+            return [
                 'data' => [
                     'transaction' => [
                         'airtel_money_id' => 'CI210104.1549.C00029',
@@ -200,7 +200,7 @@ class airtel_helper {
         }
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
-        return $this->is_testing($airtelmoneyid) ? $result : $this->request_post('standard/v1/payments/refund', $data, $headers);
+        return $this->request_post('standard/v1/payments/refund', $data, $headers);
     }
 
     /**
@@ -212,7 +212,7 @@ class airtel_helper {
      */
     public function transaction_enquiry(string $transid, string $currency): array {
         if ($this->is_testing($transid)) {
-            $result = [
+            return [
                 'data' => [
                     'transaction' => [
                        'airtel_money_id' => 'C3648.00993.538XX.XX67',
@@ -231,7 +231,7 @@ class airtel_helper {
             ];
         }
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
-        return $this->is_testing($transid) ? $result : $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
+        return $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
     }
 
     /**
