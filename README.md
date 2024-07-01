@@ -36,6 +36,10 @@ To set up access within Moodle you will need to:
 - If you want to test this plugin in the sandbox environment, contact your local Airtel representative. He/she will *manually* confirm your test payment.
 - Do __NOT__ rely on the sandbox environment, sometimes this service just stops working. If you are lucky, everything returns to normal after a week
 
+## Warning
+
+This plugin is 100% open source and has NOT been tested in Moodle Workplace, Totara, or any other proprietary software system. As long as the latter do not reward plugin developers, you can use this plugin only in 100% open source environments.
+
 ## Requirements
 
 - This plugin requires Moodle 4.2.0+
