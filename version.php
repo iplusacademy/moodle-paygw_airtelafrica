@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->requires = 2023042400;
+$plugin->requires = 2024042200;
 $plugin->component = 'paygw_airtelafrica';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->supported = [402, 404];
-$plugin->release = 'v4.2.7';
-$plugin->version = 2024031000;
+$plugin->supported = [404, 405];
+$plugin->release = 'v4.5.1';
+$plugin->version = 2024101700;
