@@ -39,7 +39,7 @@
 <div id="airtel-extra" class="bg-grey rounded mb-2 w-100 text-center"></div>
 <div class="mb-2 w-100 text-center font-italic">{{#str}} warning_phone, paygw_airtelafrica {{/str}}</div>
 <div class="text-center">
-    <form id="airtel-form" action="../payment/gateway/airtelafrica/continue.php" method="post">
+    <form id="airtel-form" action="{{{config.wwwroot}}}/payment/gateway/airtelafrica/continue.php" method="post">
         <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="airtel-pay" class="airtel-pay btn btn-primary" data-for="enablepay">
         <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="airtel-cancel" class="airtel-pay btn btn-secondary" data-for="enablepay">
     </form>
