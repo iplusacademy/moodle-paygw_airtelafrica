@@ -53,8 +53,8 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test Airtel Africa helper
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\event\request_log
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
+     * #[CoversClass(paygw_airtelafrica\event\request_log)]
      */
     public function test_empty_helper(): void {
         $helper = new airtel_helper($this->config);
@@ -84,8 +84,8 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test manual callback Airtel Africa payment
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\event\request_log
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
+     * #[CoversClass(paygw_airtelafrica\event\request_log)]
      */
     public function test_callback_manualy(): void {
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => '666666666']);
@@ -109,7 +109,7 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test enrol Airtel Africa payment
-     * @covers \paygw_airtelafrica\airtel_helper
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
      */
     public function test_enrol_manualy(): void {
         if ($this->config['clientidsb'] == '') {
@@ -134,8 +134,8 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test manual Airtel Africa payment
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\event\request_log
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
+     * #[CoversClass(paygw_airtelafrica\event\request_log)]
      */
     public function test_airtel_manualy(): void {
         if ($this->config['clientidsb'] == '') {
@@ -168,8 +168,8 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test Airtel Africa payment
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\event\request_log
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
+     * #[CoversClass(paygw_airtelafrica\event\request_log)]
      */
     public function test_airtel_payment(): void {
         if ($this->config['clientidsb'] == '') {
@@ -242,7 +242,7 @@ final class airtel_helper_test extends \advanced_testcase {
 
     /**
      * Test plugin.
-     * @covers \paygw_airtelafrica\airtel_helper
+     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
      */
     public function test_plugin(): void {
         $helper = new airtel_helper($this->config);

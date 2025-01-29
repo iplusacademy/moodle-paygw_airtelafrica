@@ -36,7 +36,7 @@ namespace paygw_airtelafrica\task;
 final class clean_up_test extends \advanced_testcase {
     /**
      * Test clean up.
-     * @covers \paygw_airtelafrica\task\clean_up
+     * #[CoversClass(paygw_airtelafrica\task\clean_up)]
      */
     public function test_clean_up(): void {
         global $DB;

@@ -36,7 +36,7 @@ namespace paygw_airtelafrica\event;
 final class request_log_test extends \advanced_testcase {
     /**
      * Test request_log.
-     * @covers \paygw_airtelafrica\event\request_log
+     * #[CoversClass(paygw_airtelafrica\event\request_log)]
      */
     public function test_gateway(): void {
         global $DB;
