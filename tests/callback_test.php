@@ -44,7 +44,7 @@ final class callback_test extends \advanced_testcase {
 
     /**
      * Test callback.
-     * #[CoversNothing]
+     * @coversNothing
      */
     public function test_callback(): void {
         global $DB;

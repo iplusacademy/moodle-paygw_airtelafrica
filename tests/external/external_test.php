@@ -79,7 +79,7 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external config for js.
-     * #[CoversClass(paygw_airtelafrica\external\get_config_for_js)]
+     * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_config_for_js(): void {
         $out = get_config_for_js::execute_parameters();
@@ -112,7 +112,7 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction_start.
-     * #[CoversClass(paygw_airtelafrica\external\transaction_start)]
+     * @covers \paygw_airtelafrica\external\transaction_start
      */
     public function test_transaction_start(): void {
         $out = transaction_start::execute_parameters();
@@ -142,9 +142,9 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction complete.
-     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
-     * #[CoversClass(paygw_airtelafrica\external\transaction_start)]
-     * #[CoversClass(paygw_airtelafrica\external\transaction_complete)]
+     * @covers \paygw_airtelafrica\airtel_helper
+     * @covers \paygw_airtelafrica\external\transaction_start
+     * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete(): void {
         $out = transaction_complete::execute_parameters();
@@ -173,10 +173,10 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test complete cycle.
-     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
-     * #[CoversClass(paygw_airtelafrica\external\get_config_for_js)]
-     * #[CoversClass(paygw_airtelafrica\external\transaction_start)]
-     * #[CoversClass(paygw_airtelafrica\external\transaction_complete)]
+     * @covers \paygw_airtelafrica\airtel_helper
+     * @covers \paygw_airtelafrica\external\get_config_for_js
+     * @covers \paygw_airtelafrica\external\transaction_start
+     * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_complete_cycle(): void {
         if ($this->config['clientidsb'] == 'fakelogin') {
@@ -213,8 +213,8 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test request log.
-     * #[CoversClass(paygw_airtelafrica\event\request_log)]
-     * #[CoversClass(paygw_airtelafrica\airtel_helper)]
+     * @covers \paygw_airtelafrica\event\request_log
+     * @covers \paygw_airtelafrica\airtel_helper
      */
     public function test_request_log(): void {
         global $DB;
@@ -242,7 +242,7 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test payable.
-     * #[CoversClass(paygw_airtelafrica\external\get_config_for_js)]
+     * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_payable(): void {
         global $CFG;
