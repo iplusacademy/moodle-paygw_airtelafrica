@@ -42,7 +42,7 @@ Feature: Airtel Africa payment gateway test
     When I log in as "student1"
     And I am on course index
     And I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
@@ -50,14 +50,14 @@ Feature: Airtel Africa payment gateway test
     And I click on "Cancel" "button" in the "Airtel Africa" "dialogue"
     Then I should see "Airtel Africa" in the "Select payment type" "dialogue"
     And I click on "Cancel" "button" in the "Select payment type" "dialogue"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
 
   @javascript
   Scenario: Student can see the Airtel Africa payment prompt
     When I log in as "student1"
     And I am on course index
     And I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "5,000"
     And I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
@@ -75,7 +75,7 @@ Feature: Airtel Africa payment gateway test
     When I log in as "student2"
     And I am on course index
     And I follow "Course 2"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "5,000"
     When I press "Select payment type"
     And I should see "Airtel Africa" in the "Select payment type" "dialogue"
@@ -95,7 +95,7 @@ Feature: Airtel Africa payment gateway test
     When I log in as "guest"
     And I am on course index
     And I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "5,000"
     And I should see "Log in to the site"
 
@@ -103,6 +103,6 @@ Feature: Airtel Africa payment gateway test
     When I log in as "guest"
     And I am on course index
     And I follow "Course 2"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "5,000"
     And I should see "Log in to the site"
