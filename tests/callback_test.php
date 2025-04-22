@@ -24,6 +24,7 @@
  */
 
 namespace paygw_airtelafrica;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Testing callback in Airtel Africa payments API
@@ -44,7 +45,6 @@ final class callback_test extends \advanced_testcase {
 
     /**
      * Test callback.
-     * @coversNothing
      */
     public function test_callback(): void {
         global $DB;

@@ -24,6 +24,7 @@
  */
 
 namespace paygw_airtelafrica;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Testing callback in Airtel Africa payments API
@@ -33,6 +34,7 @@ namespace paygw_airtelafrica;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(\behat_paygw_airtelafrica::class)]
 final class behat_test extends \advanced_testcase {
     /**
      * Setup function.
@@ -46,7 +48,6 @@ final class behat_test extends \advanced_testcase {
 
     /**
      * Test callback.
-     * @covers \behat_paygw_airtelafrica
      */
     public function test_behat(): void {
         $behat = new \behat_paygw_airtelafrica();

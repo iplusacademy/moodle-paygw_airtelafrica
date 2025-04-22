@@ -24,6 +24,7 @@
  */
 
 namespace paygw_airtelafrica\task;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Testing cleanup
@@ -33,10 +34,10 @@ namespace paygw_airtelafrica\task;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(clean_up::class)]
 final class clean_up_test extends \advanced_testcase {
     /**
      * Test clean up.
-     * @covers \paygw_airtelafrica\task\clean_up
      */
     public function test_clean_up(): void {
         global $DB;

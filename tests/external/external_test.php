@@ -27,6 +27,7 @@ namespace paygw_airtelafrica\external;
 
 use core_external;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Testing externals in payments API
@@ -37,6 +38,10 @@ use core_external\{external_api, external_function_parameters, external_value, e
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
+#[CoversClass(get_config_for_js::class)]
+#[CoversClass(transaction_start::class)]
+#[CoversClass(transaction_complete::class)]
+#[CoversClass(\paygw_airtelafrica\airtel_helper::class)]
 final class external_test extends \advanced_testcase {
     /** @var config configuration */
     private $config;
@@ -49,7 +54,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Tests initial setup.
-     *
      */
     protected function setUp(): void {
         global $DB;
@@ -79,7 +83,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external config for js.
-     * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_config_for_js(): void {
         $out = get_config_for_js::execute_parameters();
@@ -112,7 +115,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction_start.
-     * @covers \paygw_airtelafrica\external\transaction_start
      */
     public function test_transaction_start(): void {
         $out = transaction_start::execute_parameters();
@@ -142,9 +144,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction complete.
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\external\transaction_start
-     * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_transaction_complete(): void {
         $out = transaction_complete::execute_parameters();
@@ -173,10 +172,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test complete cycle.
-     * @covers \paygw_airtelafrica\airtel_helper
-     * @covers \paygw_airtelafrica\external\get_config_for_js
-     * @covers \paygw_airtelafrica\external\transaction_start
-     * @covers \paygw_airtelafrica\external\transaction_complete
      */
     public function test_complete_cycle(): void {
         if ($this->config['clientidsb'] == 'fakelogin') {
@@ -213,8 +208,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test request log.
-     * @covers \paygw_airtelafrica\event\request_log
-     * @covers \paygw_airtelafrica\airtel_helper
      */
     public function test_request_log(): void {
         global $DB;
@@ -242,7 +235,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test payable.
-     * @covers \paygw_airtelafrica\external\get_config_for_js
      */
     public function test_payable(): void {
         global $CFG;
