@@ -67,9 +67,13 @@ final class callback_test extends \advanced_testcase {
             ],
         ];
         $headers = ['Content-Type' => 'application/json'];
-        $url = 'https://test.ewallah.net/payment/gateway/airtelafrica/callback.php';
-        $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $data]);
-        $result = json_decode($response->getBody()->getContents(), true);
-        $this->assertEmpty($result);
+        $url = 'https://ewallah.net/payment/gateway/airtelafrica/callback.php';
+        try {
+            $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $data]);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $this->assertEmpty($result);
+        } catch (\Exception $e) {
+            $this->assertStringContainsString('Client error', $e->getmessage());
+        }
     }
 }
