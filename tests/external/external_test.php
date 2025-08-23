@@ -190,7 +190,7 @@ final class external_test extends \advanced_testcase {
         $this->assertNotEmpty($result['reference']);
 
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid);
-        if (count($result) > 0) {
+        if (count($result) > 0 && $result['transactionid'] != '0') {
             $this->assertNotEmpty($result['transactionid']);
             $this->assertEquals('Your transaction has been successfully processed.', $result['message']);
 

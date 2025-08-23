@@ -69,7 +69,8 @@ final class gateway_test extends \advanced_testcase {
         $data->enabled = true;
         gateway::validate_gateway_form($form, $data, [], $errors);
         $this->assertCount(1, $errors);
-        $this->assertEquals($errors,
+        $this->assertEquals(
+            $errors,
             [
                 'enabled' => 'The payment gateway cannot be enabled because the configuration is incomplete.',
             ]
@@ -109,7 +110,6 @@ final class gateway_test extends \advanced_testcase {
         $this->assertStringContainsString('Help with Client ID', $out);
         $this->assertStringContainsString('Help with Secret', $out);
         $this->assertStringContainsString('Help with Sandbox Client', $out);
-
     }
 
     /**

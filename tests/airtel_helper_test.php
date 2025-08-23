@@ -125,9 +125,9 @@ final class airtel_helper_test extends \advanced_testcase {
             $this->assertEquals(1, $result['status']['success']);
             $transactionid = $result['data']['transaction']['id'];
             $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
+            $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+            $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
         }
-        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
-        $helper->enrol_user($transactionid, $random, 'enrol_fee', 'fee');
     }
 
     /**

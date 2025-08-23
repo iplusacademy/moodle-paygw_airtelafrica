@@ -111,7 +111,6 @@ final class provider_test extends provider_testcase {
         $pid = $DB->insert_record('paygw_airtelafrica', $data);
         $data->id = $pid;
         $this->payrec = $data;
-
     }
 
     /**

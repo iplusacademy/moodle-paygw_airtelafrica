@@ -34,6 +34,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(airtel_helper::class)]
 final class callback_test extends \advanced_testcase {
     /**
      * Setup function.
@@ -67,7 +68,7 @@ final class callback_test extends \advanced_testcase {
             ],
         ];
         $headers = ['Content-Type' => 'application/json'];
-        $url = 'https://ewallah.net/payment/gateway/airtelafrica/callback.php';
+        $url = 'https://eWallah.net/payment/gateway/airtelafrica/callback.php';
         try {
             $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $data]);
             $result = json_decode($response->getBody()->getContents(), true);

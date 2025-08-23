@@ -258,7 +258,6 @@ class airtel_helper {
                 $result = json_decode($response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\Exception $e) {
-                mtrace($result);
                 mtrace_exception($e);
                 return [];
             }
@@ -268,7 +267,9 @@ class airtel_helper {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
         } catch (\Exception $e) {
-            mtrace_exception($e);
+            if ($e->getCode() !== 403) {
+                mtrace_exception($e);
+            }
             $result = $e->getMessage();
         } finally {
             $decoded = json_decode($result, true);

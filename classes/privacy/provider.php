@@ -44,7 +44,6 @@ class provider implements
     paygw_provider,
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider {
-
     /**
      * Returns meta data about this system.
      *
