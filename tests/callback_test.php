@@ -57,6 +57,7 @@ final class callback_test extends \advanced_testcase {
         $data->timecreated = time();
         $data->component = 'enrol_fee';
         $data->paymentarea = 'fee';
+
         $DB->insert_record('paygw_airtelafrica', $data);
         $client = new \GuzzleHttp\Client();
         $data = [
@@ -71,10 +72,10 @@ final class callback_test extends \advanced_testcase {
         $url = 'https://eWallah.net/payment/gateway/airtelafrica/callback.php';
         try {
             $response = $client->request('POST', $url, ['headers' => $headers, 'json' => $data]);
-            $result = json_decode($response->getBody()->getContents(), true);
+            $result = json_decode((string) $response->getBody()->getContents(), true);
             $this->assertEmpty($result);
-        } catch (\Exception $e) {
-            $this->assertStringContainsString('Client error', $e->getmessage());
+        } catch (\Exception $exception) {
+            $this->assertStringContainsString('Client error', $exception->getmessage());
         }
     }
 }

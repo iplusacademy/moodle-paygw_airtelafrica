@@ -36,18 +36,18 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @runTestsInSeparateProcesses
  */
 #[CoversClass(get_config_for_js::class)]
 #[CoversClass(transaction_start::class)]
 #[CoversClass(transaction_complete::class)]
 #[CoversClass(\paygw_airtelafrica\airtel_helper::class)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class external_test extends \advanced_testcase {
     /** @var config configuration */
     private $config;
 
     /** @var string phone */
-    private $phone;
+    private string $phone = '666666666';
 
     /** @var int feeid. */
     private $feeid;
@@ -59,7 +59,7 @@ final class external_test extends \advanced_testcase {
         global $DB;
         parent::setUp();
         $this->resetAfterTest(true);
-        $this->phone = getenv('phone') ? getenv('phone') : '666666666';
+        $this->phone = getenv('phone') ?: '666666666';
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'airtelafrica']);
         $accountid = $account->get('id');
@@ -69,13 +69,14 @@ final class external_test extends \advanced_testcase {
         $feeplugin = enrol_get_plugin('fee');
         $this->feeid = $feeplugin->add_instance($course, $data);
         $config = new \stdClass();
-        $config->clientid = getenv('login') ? getenv('login') : 'fakelogin';
-        $config->clientidsb = getenv('login') ? getenv('login') : 'fakelogin';
+        $config->clientid = getenv('login') ?: 'fakelogin';
+        $config->clientidsb = getenv('login') ?: 'fakelogin';
         $config->brandname = 'maul';
         $config->environment = 'sandbox';
-        $config->secret = getenv('secret') ? getenv('secret') : 'fakesecret';
-        $config->secretsb = getenv('secret') ? getenv('secret') : 'fakesecret';
+        $config->secret = getenv('secret') ?: 'fakesecret';
+        $config->secretsb = getenv('secret') ?: 'fakesecret';
         $config->country = 'UG';
+
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
         $this->config = (array)$config;
         $this->setUser($user);
@@ -177,8 +178,9 @@ final class external_test extends \advanced_testcase {
         if ($this->config['clientidsb'] == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
         }
+
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
-        $clientid = getenv('login') ? getenv('login') : 'fakelogin';
+        $clientid = getenv('login') ?: 'fakelogin';
         $currency = $result['currency'];
         $this->assertEquals($clientid, $result['clientid']);
         $this->assertEquals('maul', $result['brandname']);
@@ -216,7 +218,7 @@ final class external_test extends \advanced_testcase {
         $this->setUser($user);
         $configs = $DB->get_records('payment_gateways');
         $config = reset($configs);
-        $config = json_decode($config->config);
+        json_decode((string) $config->config);
         \paygw_airtelafrica\event\request_log::get_name();
         $arr = [
             'context' => \context_system::instance(),
@@ -256,7 +258,7 @@ final class external_test extends \advanced_testcase {
         $this->assertEquals('EUR', $payable->get_currency());
         $successurl = \enrol_fee\payment\service_provider::get_success_url('fee', $this->feeid);
         $this->assertEquals($CFG->wwwroot . '/course/view.php?id=' . $course->id, $successurl->out(false));
-        $account = new \core_payment\account($payable->get_account_id());
+        new \core_payment\account($payable->get_account_id());
 
         \enrol_fee\payment\service_provider::deliver_order('fee', $this->feeid, $paymentid, $user->id);
         $context = \context_course::instance($course->id);

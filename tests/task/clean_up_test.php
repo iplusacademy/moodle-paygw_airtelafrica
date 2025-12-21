@@ -51,6 +51,7 @@ final class clean_up_test extends \advanced_testcase {
         $data->transactionid = 1;
         $data->moneyid = 1;
         $data->timecreated = time();
+
         $DB->insert_record('paygw_airtelafrica', $data);
         $cnt = $DB->count_records('paygw_airtelafrica', []);
         $this->assertEquals(1, $cnt);

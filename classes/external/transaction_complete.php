@@ -63,7 +63,6 @@ class transaction_complete extends external_api {
      * @param string $paymentarea The payment area
      * @param int $itemid An internal identifier that is used by the component
      * @param string $transactionid Airtel Africa order ID
-     * @return array
      */
     public static function execute(string $component, string $paymentarea, int $itemid, string $transactionid): array {
         global $USER;
@@ -80,7 +79,7 @@ class transaction_complete extends external_api {
         $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, 'airtelafrica');
         $helper = new airtel_helper($config);
         $trans = $helper->enrol_user($transactionid, $itemid, $component, $paymentarea);
-        return ['success' => (bool)($trans == 'TS'), 'message' => airtel_helper::ta_code($trans)];
+        return ['success' => $trans == 'TS', 'message' => airtel_helper::ta_code($trans)];
     }
 
     /**

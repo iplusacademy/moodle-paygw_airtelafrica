@@ -41,7 +41,7 @@ class airtel_helper {
     /**
      * @var string The base API URL
      */
-    private $airtelurl;
+    private readonly string $airtelurl;
 
     /**
      * @var string Client ID
@@ -61,7 +61,7 @@ class airtel_helper {
     /**
      * @var bool Sandbox
      */
-    private $sandbox;
+    private readonly bool $sandbox;
 
     /**
      * @var string The oath bearer token
@@ -80,7 +80,7 @@ class airtel_helper {
      * @param string $country Airtel Africa location.
      */
     public function __construct(array $config, string $country = 'UG') {
-        $this->sandbox = strtolower($config['environment']) == 'sandbox';
+        $this->sandbox = strtolower((string) $config['environment']) === 'sandbox';
         $this->clientid = $config[$this->sandbox ? 'clientidsb' : 'clientid'];
         $this->secret = $config[$this->sandbox ? 'secretsb' : 'secret'];
         $this->airtelurl = $this::get_baseurl();
@@ -90,8 +90,6 @@ class airtel_helper {
 
     /**
      * Which url should be used.
-     *
-     * @return string
      */
     private function get_baseurl(): string {
         return $this->sandbox ? 'https://openapiuat.airtel.africa/' : 'https://openapi.airtel.africa/';
@@ -99,8 +97,6 @@ class airtel_helper {
 
     /**
      * Production or sandbox.
-     *
-     * @return string
      */
     private function get_base(): string {
         return $this->sandbox ? 'sandbox' : 'live';
@@ -112,10 +108,9 @@ class airtel_helper {
      * We assume there is no user with telephone number 666666666
      *
      * @param string $id
-     * @return bool
      */
     private function is_testing(string $id): bool {
-        return $this->sandbox && ($id == '666666666');
+        return $this->sandbox && ($id === '666666666');
     }
 
     /**
@@ -198,6 +193,7 @@ class airtel_helper {
                 ],
             ];
         }
+
         $headers = ['X-Country' => $this->country, 'X-Currency' => $currency];
         $data = ['transaction' => ['airtel_money_id' => $airtelmoneyid]];
         return $this->request_post('standard/v1/payments/refund', $data, $headers);
@@ -230,8 +226,9 @@ class airtel_helper {
                 ],
             ];
         }
+
         $headers = ['Accept' => '*/*', 'X-Country' => $this->country, 'X-Currency' => $currency];
-        return $this->request_post("standard/v1/payments/$transid", [], $headers, 'GET');
+        return $this->request_post("standard/v1/payments/{$transid}", [], $headers, 'GET');
     }
 
     /**
@@ -255,24 +252,26 @@ class airtel_helper {
                     $this->airtelurl . 'auth/oauth2/token',
                     ['headers' => ['Content-Type' => 'application/json'], 'json' => $authdata]
                 );
-                $result = json_decode($response->getBody()->getContents(), true);
+                $result = json_decode((string) $response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
             } catch (\Exception $e) {
                 mtrace_exception($e);
                 return [];
             }
         }
+
         $headers = array_merge($headers, ['Content-Type' => 'application/json', 'Authorization' => 'Bearer   ' . $this->token]);
         try {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-        } catch (\Exception $e) {
-            if ($e->getCode() !== 403) {
-                mtrace_exception($e);
+        } catch (\Exception $exception) {
+            if ($exception->getCode() !== 403) {
+                mtrace_exception($exception);
             }
-            $result = $e->getMessage();
+
+            $result = $exception->getMessage();
         } finally {
-            $decoded = json_decode($result, true);
+            $decoded = json_decode((string) $result, true);
             // Trigger an event.
             $eventargs = [
                 'context' => \context_system::instance(),
@@ -300,7 +299,6 @@ class airtel_helper {
      * @param int $itemid
      * @param string $component Name of the component that the itemid belongs to
      * @param string $area The payment area
-     * @return string
      */
     public function enrol_user(string $transactionid, int $itemid, string $component, string $area): string {
         global $DB;
@@ -315,6 +313,7 @@ class airtel_helper {
                 if (is_enrolled($context, $rec->userid, '', true)) {
                     return 'TS';
                 }
+
                 $this->token = $rec->moneyid;
                 $payable = helper::get_payable($component, $area, $itemid);
                 $currency = $payable->get_currency();
@@ -350,13 +349,13 @@ class airtel_helper {
                 }
             }
         }
+
         return $trans;
     }
 
     /**
      * Transaction code
      * @param string $code
-     * @return string
      */
     public static function esb_code(string $code): string {
         $returns = [
@@ -380,7 +379,6 @@ class airtel_helper {
     /**
      * Transaction code
      * @param string $code
-     * @return string
      */
     public static function ta_code(string $code): string {
         $returns = [
@@ -397,7 +395,6 @@ class airtel_helper {
      *
      * Collection api DP008 specific codes.
      * @param string $code
-     * @return string
      */
     public static function dp_code(string $code): string {
         $returns = [
@@ -428,31 +425,23 @@ class airtel_helper {
      */
     public static function array_helper(string $key, array $arr) {
         return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : false;
-        // Cleans key and array to avoid XSS and other issues.
-        $safekey = clean_param($key, PARAM_TEXT);
-        $safearr = clean_param_array($arr, PARAM_TEXT, true);
-        if (is_array($safearr) && isset($safearr[$safekey]) && !empty($safearr[$safekey])) {
-            return $safearr[$safekey];
-        }
-        return false;
     }
 
     /**
      * User data helper.
-     *
-     * @return array
      */
-    public function current_user_data() {
+    public function current_user_data(): array {
         global $USER;
         $arr = [];
         $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
         if ($user) {
             $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
-            $phone = preg_replace("/[^0-9]/", '', $phone);
-            if (strlen($phone) > 5) {
-                $arr = ['id' => $user->id, 'country' => strtoupper($user->country), 'phone' => $phone];
+            $phone = preg_replace("/[^0-9]/", '', (string) $phone);
+            if (strlen((string) $phone) > 5) {
+                $arr = ['id' => $user->id, 'country' => strtoupper((string) $user->country), 'phone' => $phone];
             }
         }
+
         return $arr;
     }
 }

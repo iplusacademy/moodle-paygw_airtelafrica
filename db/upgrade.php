@@ -29,7 +29,7 @@
  * @param int $oldversion
  * @return bool always true
  */
-function xmldb_paygw_airtelafrica_upgrade($oldversion) {
+function xmldb_paygw_airtelafrica_upgrade($oldversion): bool {
     global $DB;
 
     $dbman = $DB->get_manager();
@@ -39,12 +39,15 @@ function xmldb_paygw_airtelafrica_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
         $field = new xmldb_field('paymentarea', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'fee', 'component');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
         // Plugin savepoint reached.
         upgrade_plugin_savepoint(true, 2023062800, 'paygw', 'airtelafrica');
     }
+
     return true;
 }

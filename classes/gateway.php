@@ -36,8 +36,6 @@ namespace paygw_airtelafrica;
 class gateway extends \core_payment\gateway {
     /**
      * Currencies supported
-     *
-     * @return array
      */
     public static function get_supported_currencies(): array {
         return ['UGX', 'NGN', 'TZS', 'KES', 'RWF', 'XOF', 'XAF', 'CDF', 'USD', 'XAF', 'SCR', 'MGA', 'MWK', 'ZMW'];
@@ -45,8 +43,6 @@ class gateway extends \core_payment\gateway {
 
     /**
      * Countries supported
-     *
-     * @return array
      */
     public static function get_countries(): array {
         return ['CD', 'CG', 'GA', 'GH', 'KE', 'LR', 'MG', 'MW', 'NE', 'NG', 'RW', 'SC', 'TD', 'TZ', 'UG', 'ZA'];
@@ -54,8 +50,6 @@ class gateway extends \core_payment\gateway {
 
     /**
      * Countries supported
-     *
-     * @return array
      */
     private static function get_supported_countries(): array {
         $countries = self::get_countries();
@@ -64,6 +58,7 @@ class gateway extends \core_payment\gateway {
         foreach ($countries as $country) {
             $return[$country] = $strs->$country;
         }
+
         return $return;
     }
 

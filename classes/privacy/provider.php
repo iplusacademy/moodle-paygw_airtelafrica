@@ -84,7 +84,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
+    public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
         $contexts = $contextlist->get_contexts();
         foreach ($contexts as $context) {
@@ -108,11 +108,12 @@ class provider implements
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      *
      */
-    public static function get_users_in_context(userlist $userlist) {
+    public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
         if (!is_a($context, \context_user::class)) {
             return;
         }
+
         $params = ['contextlevel' => CONTEXT_USER, 'contextid' => $context->id];
         $sql = 'SELECT instanceid AS userid
                   FROM {context}
@@ -125,7 +126,7 @@ class provider implements
      *
      * @param context $context The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         if (is_a($context, \context_user::class)) {
              $DB->delete_records('paygw_airtelafrica', ['userid' => $context->instanceid]);
@@ -137,7 +138,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist) {
+    public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
         $user = $contextlist->get_user();
         $DB->delete_records('paygw_airtelafrica', ['userid' => $user->id]);
@@ -149,12 +150,12 @@ class provider implements
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      *
      */
-    public static function delete_data_for_users(approved_userlist $userlist) {
+    public static function delete_data_for_users(approved_userlist $userlist): void {
         global $DB;
         $context = $userlist->get_context();
         if (is_a($context, \context_user::class)) {
             [$insql, $inparams] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
-            $DB->delete_records_select('paygw_airtelafrica', "userid $insql", $inparams);
+            $DB->delete_records_select('paygw_airtelafrica', "userid {$insql}", $inparams);
         }
     }
 
@@ -165,7 +166,7 @@ class provider implements
      * @param array $subcontext The location within the current context that the payment data belongs
      * @param \stdClass $payment The payment record
      */
-    public static function export_payment_data(\context $context, array $subcontext, \stdClass $payment) {
+    public static function export_payment_data(\context $context, array $subcontext, \stdClass $payment): void {
         global $DB;
         $subcontext[] = get_string('gatewayname', 'paygw_airtelafrica');
         if ($record = $DB->get_record('paygw_airtelafrica', ['paymentid' => $payment->paymentid])) {
@@ -183,7 +184,7 @@ class provider implements
      * @param string $paymentsql SQL query that selects payment.id field for the payments
      * @param array $paymentparams Array of parameters for $paymentsql
      */
-    public static function delete_data_for_payment_sql(string $paymentsql, array $paymentparams) {
+    public static function delete_data_for_payment_sql(string $paymentsql, array $paymentparams): void {
         global $DB;
         $DB->delete_records_select('paygw_airtelafrica', "paymentid IN ({$paymentsql})", $paymentparams);
     }

@@ -41,7 +41,7 @@ final class airtel_helper_test extends \advanced_testcase {
     private $config;
 
     /** @var string phone */
-    private $phone;
+    private string|bool|null $phone = null;
 
     /**
      * Setup function- we will create a course and add an assign instance to it.
@@ -59,7 +59,7 @@ final class airtel_helper_test extends \advanced_testcase {
      */
     public function test_empty_helper(): void {
         $helper = new airtel_helper($this->config);
-        $this->assertEquals(get_class($helper), 'paygw_airtelafrica\airtel_helper');
+        $this->assertEquals($helper::class, 'paygw_airtelafrica\airtel_helper');
         $this->assertEquals('Transaction Success', airtel_helper::ta_code('TS'));
         $this->assertEquals('In process', airtel_helper::dp_code('DP00800001006'));
 
@@ -77,9 +77,9 @@ final class airtel_helper_test extends \advanced_testcase {
         $this->assertEquals('me', airtel_helper::array_helper('name', ['name' => 'me', $key => $arr]));
         $random = random_int(1000000000, 9999999999);
         try {
-            $helper->request_payment($random, "tst5_course_$random", 1000, 'UGX', '666666666', 'BE');
-        } catch (\moodle_exception $e) {
-            $this->assertEquals('Exception - Invalid country code provided.', $e->getmessage());
+            $helper->request_payment($random, "tst5_course_{$random}", 1000, 'UGX', '666666666', 'BE');
+        } catch (\moodle_exception $moodleexception) {
+            $this->assertEquals('Exception - Invalid country code provided.', $moodleexception->getmessage());
         }
     }
 
@@ -92,7 +92,7 @@ final class airtel_helper_test extends \advanced_testcase {
         $random = random_int(1000000000, 9999999999);
         $helper = new airtel_helper($this->config);
 
-        $result = $helper->request_payment($random, "maul_course$random", 1000, 'UGX', '666666666', 'UG');
+        $result = $helper->request_payment($random, "maul_course{$random}", 1000, 'UGX', '666666666', 'UG');
         $this->assertEquals(200, $result['status']['code']);
         $this->assertEquals(true, $result['status']['success']);
 
@@ -113,13 +113,14 @@ final class airtel_helper_test extends \advanced_testcase {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $random = random_int(1000000000, 9999999999);
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $user = $generator->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
         $helper = new airtel_helper($this->config);
-        $result = $helper->request_payment($random, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "tst_course_{$random}", 50000, 'UGX', $this->phone, 'UG');
         if (count($result) > 0) {
             $this->assertEquals(200, $result['status']['code']);
             $this->assertEquals(1, $result['status']['success']);
@@ -137,13 +138,14 @@ final class airtel_helper_test extends \advanced_testcase {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone1' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
         $helper = new airtel_helper($this->config);
 
         // Correct pin.
-        $result = $helper->request_payment($random, "tst_course_$random", 50000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "tst_course_{$random}", 50000, 'UGX', $this->phone, 'UG');
         if (count($result) > 0) {
             $this->assertEquals(200, $result['status']['code']);
             $this->assertEquals(1, $result['status']['success']);
@@ -151,9 +153,10 @@ final class airtel_helper_test extends \advanced_testcase {
 
             $this->ping_payment((int)$transactionid);
         }
+
         // Incorrect pin.
         $random = random_int(1000000000, 9999999999);
-        $result = $helper->request_payment($random, "tst1_course_$random", 50000, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "tst1_course_{$random}", 50000, 'UGX', $this->phone, 'UG');
         if (count($result) > 0) {
             $this->assertEquals(200, $result['status']['code']);
             $this->assertEquals(1, $result['status']['success']);
@@ -169,13 +172,14 @@ final class airtel_helper_test extends \advanced_testcase {
         if ($this->config['clientidsb'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $this->phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
         $helper = new airtel_helper($this->config);
 
         // Make payment.
-        $result = $helper->request_payment($random, "tst3_course$random", 66, 'UGX', $this->phone, 'UG');
+        $result = $helper->request_payment($random, "tst3_course{$random}", 66, 'UGX', $this->phone, 'UG');
         if (count($result) > 0) {
             $this->assertEquals(200, $result['status']['code']);
             $this->assertEquals(1, $result['status']['success']);
@@ -196,12 +200,13 @@ final class airtel_helper_test extends \advanced_testcase {
                 $this->assertEquals(200, $result['status']['code']);
             }
         }
+
         $user = $this->getDataGenerator()->create_user(['country' => 'UG']);
         $this->setUser($user);
         try {
-            $helper->request_payment($random, "tst4_course_$random", 1000, 'UGX', '1234567', 'BE');
-        } catch (\moodle_exception $e) {
-            $this->assertEquals('Exception - Invalid country code provided.', $e->getmessage());
+            $helper->request_payment($random, "tst4_course_{$random}", 1000, 'UGX', '1234567', 'BE');
+        } catch (\moodle_exception $moodleexception) {
+            $this->assertEquals('Exception - Invalid country code provided.', $moodleexception->getmessage());
         }
     }
 
@@ -210,9 +215,10 @@ final class airtel_helper_test extends \advanced_testcase {
      * @param string $transactionid
      */
     private function ping_payment(string $transactionid): void {
-        if ($transactionid == '0') {
+        if ($transactionid === '0') {
             throw new \moodle_exception('Invalid transaction id.');
         }
+
         $helper = new airtel_helper($this->config);
         for ($i = 1; $i < 11; $i++) {
             $result = $helper->transaction_enquiry($transactionid, 'UGX');
@@ -225,10 +231,12 @@ final class airtel_helper_test extends \advanced_testcase {
                     $this->assertNotEquals(500, $cancelresult['status']['code']);
                     break;
                 }
+
                 $response = $result['data']['transaction']['status'];
                 if ($response == 'TF' || $response == 'TS') {
                     break;
                 }
+
                 sleep(15);
             }
         }

@@ -84,6 +84,7 @@ final class provider_test extends provider_testcase {
         $data->timecreated = time();
         $data->component = 'airtelafrica';
         $data->paymentarea = 'fee';
+
         $DB->insert_record('paygw_airtelafrica', $data);
 
         $paygen = $generator->get_plugin_generator('core_payment');
@@ -108,6 +109,7 @@ final class provider_test extends provider_testcase {
         $data->timecreated = time();
         $data->component = 'airtelafrica';
         $data->paymentarea = 'fee';
+
         $pid = $DB->insert_record('paygw_airtelafrica', $data);
         $data->id = $pid;
         $this->payrec = $data;
@@ -246,6 +248,7 @@ final class provider_test extends provider_testcase {
         $data->component = 'airtelafrica';
         $data->paymentarea = 'fee';
         $data->timecompleted = time();
+
         $DB->insert_record('paygw_airtelafrica', $data);
 
         $user2 = $generator->create_user();
@@ -261,6 +264,7 @@ final class provider_test extends provider_testcase {
         $data->component = 'airtelafrica';
         $data->paymentarea = 'fee';
         $data->timecompleted = time();
+
         $DB->insert_record('paygw_airtelafrica', $data);
         return $user;
     }

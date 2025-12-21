@@ -62,7 +62,6 @@ class transaction_start extends external_api {
      * @param string $component Name of the component that the itemid belongs to
      * @param string $paymentarea
      * @param int $itemid An internal identifier that is used by the component
-     * @return array
      */
     public static function execute(string $component, string $paymentarea, int $itemid): array {
         global $DB, $USER;
@@ -99,6 +98,7 @@ class transaction_start extends external_api {
             if ($DB->record_exists('paygw_airtelafrica', $cond)) {
                 $DB->delete_records('paygw_airtelafrica', $cond);
             }
+
             $transactionid = $data['transaction']['id'] ?? '0';
             $data = new \stdClass();
             $data->paymentid = $itemid;
@@ -110,6 +110,7 @@ class transaction_start extends external_api {
             $data->paymentarea = $paymentarea;
             $DB->insert_record('paygw_airtelafrica', $data);
         }
+
         return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => airtel_helper::esb_code($esb)];
     }
 

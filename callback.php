@@ -71,8 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                     'other' => $transaction,
                 ];
             }
+
             \paygw_airtelafrica\event\request_log::create($eventargs)->trigger();
         }
     }
 }
+
 die();

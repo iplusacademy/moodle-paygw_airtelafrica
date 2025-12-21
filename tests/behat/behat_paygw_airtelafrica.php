@@ -41,8 +41,8 @@ use Behat\Gherkin\Node\TableNode;
 class behat_paygw_airtelafrica extends behat_base {
     /**
      * Get the secrets from the environment.
-     * @Then I configure airtel
      */
+    #[\Behat\Step\Then('I configure airtel')]
     public function i_configure_airtel(): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/enrol/locallib.php');
@@ -57,15 +57,16 @@ class behat_paygw_airtelafrica extends behat_base {
         $account->idnumber = 'testid';
         $account->gateways = 'airtelafrica';
         $account->enabled = 1;
-        $account = \core_payment\helper::save_payment_account((object)$account);
+        $account = \core_payment\helper::save_payment_account($account);
+
         $gateway = new \stdClass();
         $gateway->accountid = $account->get('id');
         $gateway->gateway = 'airtelafrica';
         $gateway->enabled = 1;
-        \core_payment\helper::save_payment_gateway((object)$gateway);
+        \core_payment\helper::save_payment_gateway($gateway);
 
-        $login = getenv('login') ? getenv('login') : 'fakelogin';
-        $secret = getenv('secret') ? getenv('secret') : 'fakesecret';
+        $login = getenv('login') ?: 'fakelogin';
+        $secret = getenv('secret') ?: 'fakesecret';
         $config = new \stdClass();
         $config->clientid = $login;
         $config->clientidsb = $login;
@@ -74,6 +75,7 @@ class behat_paygw_airtelafrica extends behat_base {
         $config->secret = $secret;
         $config->secretsb = $secret;
         $config->country = 'UG';
+
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
     }
 }
