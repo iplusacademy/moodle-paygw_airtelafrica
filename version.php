@@ -30,6 +30,6 @@ $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = 'v5.1.1';
-$plugin->version = 2025101200;
+$plugin->version = 2026021000;
 $plugin->requires = 2025041400;
 $plugin->supported = [500, 501];
