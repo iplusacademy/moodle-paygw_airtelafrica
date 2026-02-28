@@ -25,9 +25,11 @@
 
 namespace paygw_airtelafrica;
 
+use context_course;
+use context_system;
 use core_payment\helper;
 use core_text;
-use curl;
+use Exception;
 
 /**
  * Contains helper class to work with Airtel Africa REST API.
@@ -254,7 +256,7 @@ class airtel_helper {
                 );
                 $result = json_decode((string) $response->getBody()->getContents(), true);
                 $this->token = array_key_exists('access_token', $result) ? $result['access_token'] : '';
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 mtrace_exception($e);
                 return [];
             }
@@ -264,7 +266,7 @@ class airtel_helper {
         try {
             $response = $client->request($verb, $this->airtelurl . $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ($exception->getCode() !== 403) {
                 mtrace_exception($exception);
             }
@@ -274,7 +276,7 @@ class airtel_helper {
             $decoded = json_decode((string) $result, true);
             // Trigger an event.
             $eventargs = [
-                'context' => \context_system::instance(),
+                'context' => context_system::instance(),
                 'other' => [
                     'verb' => $verb,
                     $this->get_base() => $location,
@@ -283,7 +285,7 @@ class airtel_helper {
                     'testing' => $this->testing ? 'true' : 'false',
                 ],
             ];
-            $event = \paygw_airtelafrica\event\request_log::create($eventargs);
+            $event = event\request_log::create($eventargs);
             $event->trigger();
             // Uncomment folowing line to have the data returned by Airtel.
             // mtrace($result);.
@@ -309,7 +311,7 @@ class airtel_helper {
             if ($rec->timecompleted == 0) {
                 // If user is already enrolled?
                 $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $rec->paymentarea, 'id' => $rec->paymentid]);
-                $context = \context_course::instance($courseid);
+                $context = context_course::instance($courseid);
                 if (is_enrolled($context, $rec->userid, '', true)) {
                     return 'TS';
                 }
